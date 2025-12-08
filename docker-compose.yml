@@ -1,0 +1,92 @@
+name: limit-order-exchange
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/frankenphp/Dockerfile
+    ports:
+      - "8000:8000"
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/vendor
+      - /app/node_modules
+
+  node:
+    image: node:22-alpine
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: sleep infinity
+    tty: true
+
+  queue:
+    build:
+      context: .
+      dockerfile: docker/frankenphp/Dockerfile
+    command: php artisan queue:work --sleep=3 --tries=3 --max-time=3600
+    env_file: .env
+    depends_on:
+      - app
+      - redis
+    volumes:
+      - .:/app
+      - /app/vendor
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-exchange}
+      POSTGRES_USER: ${DB_USERNAME:-exchange}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-exchange}
+    ports:
+      - "${DB_PORT:-5433}:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-exchange} -d ${DB_DATABASE:-exchange}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy allkeys-lru
+    ports:
+      - "${REDIS_PORT:-6380}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  soketi:
+    image: quay.io/soketi/soketi:1.6-16-debian
+    ports:
+      - "6001:6001"
+      - "9601:9601"
+    environment:
+      SOKETI_DEBUG: "1"
+      SOKETI_DEFAULT_APP_ID: "app-id"
+      SOKETI_DEFAULT_APP_KEY: "app-key"
+      SOKETI_DEFAULT_APP_SECRET: "app-secret"
+      SOKETI_DEFAULT_APP_ENABLE_CLIENT_MESSAGES: "true"
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:6001', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))\""]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  db-data:
+  redis-data:
+
