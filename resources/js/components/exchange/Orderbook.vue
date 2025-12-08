@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Card, CardHeader, CardTitle, CardContent, Button, Select, Label } from '@/components/ui'
+import { Card, CardHeader, CardTitle, CardContent, Button, Select, Label, Badge } from '@/components/ui'
 import { useExchangeStore } from '@/stores/exchange'
 import type { Side, OrderStatus } from '@/types'
 
@@ -46,16 +46,16 @@ function getStatusLabel(status: OrderStatus): string {
   }
 }
 
-function getStatusClass(status: OrderStatus): string {
+function getStatusVariant(status: OrderStatus): 'default' | 'success' | 'secondary' | 'destructive' | 'outline' {
   switch (status) {
     case 1:
-      return 'text-blue-400'
+      return 'default'
     case 2:
-      return 'text-emerald-400'
+      return 'success'
     case 3:
-      return 'text-muted-foreground'
+      return 'secondary'
     default:
-      return ''
+      return 'outline'
   }
 }
 </script>
@@ -99,13 +99,13 @@ function getStatusClass(status: OrderStatus): string {
             <div
               v-for="order in buys"
               :key="order.id"
-              class="flex justify-between rounded bg-emerald-950/30 px-3 py-2 text-sm"
+              class="flex items-center justify-between gap-2 rounded bg-emerald-950/30 px-3 py-2 text-sm"
             >
               <span class="text-muted-foreground">#{{ order.id }}</span>
-              <span>{{ order.price }} @ {{ order.amount }}</span>
-              <span v-if="statusFilter" :class="getStatusClass(order.status)" class="text-xs">
+              <span class="flex-1 text-right">{{ order.price }} @ {{ order.amount }}</span>
+              <Badge v-if="statusFilter" :variant="getStatusVariant(order.status)" class="ml-2">
                 {{ getStatusLabel(order.status) }}
-              </span>
+              </Badge>
             </div>
             <div v-if="buys.length === 0" class="py-4 text-center text-sm text-muted-foreground">
               No buy orders
@@ -119,13 +119,13 @@ function getStatusClass(status: OrderStatus): string {
             <div
               v-for="order in sells"
               :key="order.id"
-              class="flex justify-between rounded bg-rose-950/30 px-3 py-2 text-sm"
+              class="flex items-center justify-between gap-2 rounded bg-rose-950/30 px-3 py-2 text-sm"
             >
               <span class="text-muted-foreground">#{{ order.id }}</span>
-              <span>{{ order.price }} @ {{ order.amount }}</span>
-              <span v-if="statusFilter" :class="getStatusClass(order.status)" class="text-xs">
+              <span class="flex-1 text-right">{{ order.price }} @ {{ order.amount }}</span>
+              <Badge v-if="statusFilter" :variant="getStatusVariant(order.status)" class="ml-2">
                 {{ getStatusLabel(order.status) }}
-              </span>
+              </Badge>
             </div>
             <div v-if="sells.length === 0" class="py-4 text-center text-sm text-muted-foreground">
               No sell orders
@@ -140,7 +140,7 @@ function getStatusClass(status: OrderStatus): string {
           v-for="order in store.orderbook"
           :key="order.id"
           :class="[
-            'flex justify-between rounded px-3 py-2 text-sm',
+            'flex items-center gap-2 rounded px-3 py-2 text-sm',
             order.side === 'buy' ? 'bg-emerald-950/30' : 'bg-rose-950/30',
           ]"
         >
@@ -148,10 +148,10 @@ function getStatusClass(status: OrderStatus): string {
           <span :class="order.side === 'buy' ? 'text-emerald-400' : 'text-rose-400'">
             {{ order.side.toUpperCase() }}
           </span>
-          <span>{{ order.price }} @ {{ order.amount }}</span>
-          <span v-if="statusFilter" :class="getStatusClass(order.status)" class="text-xs">
+          <span class="flex-1 text-right">{{ order.price }} @ {{ order.amount }}</span>
+          <Badge v-if="statusFilter" :variant="getStatusVariant(order.status)" class="ml-2">
             {{ getStatusLabel(order.status) }}
-          </span>
+          </Badge>
         </div>
         <div v-if="store.orderbook.length === 0" class="py-4 text-center text-sm text-muted-foreground">
           No orders found
