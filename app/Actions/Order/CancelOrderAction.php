@@ -62,9 +62,9 @@ final class CancelOrderAction
         $this->assetRepository->unlockAmount($order->user_id, $order->symbol, $order->amount);
     }
 
-    public function asController(Order $order): JsonResponse
+    public function asController(CancelOrderRequest $request, Order $order): JsonResponse
     {
-        $order = $this->handle(request()->user(), $order);
+        $order = $this->handle($order);
 
         return OrderResource::make($order)->response();
     }
