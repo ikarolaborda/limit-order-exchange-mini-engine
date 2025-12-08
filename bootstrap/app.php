@@ -13,9 +13,15 @@ return Application::configure(basePath: dirname(__DIR__))
         channels: __DIR__.'/../routes/channels.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
+        then: function (): void {
+            // L5-Swagger routes are registered automatically via service provider
+        },
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
+        $middleware->validateCsrfTokens(except: [
+            'api/*', // API routes use token authentication, not CSRF
+        ]);
         $middleware->web(append: [
             \App\Http\Middleware\NoCacheHeaders::class,
         ]);
