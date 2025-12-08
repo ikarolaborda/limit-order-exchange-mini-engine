@@ -99,7 +99,7 @@ Before you begin, ensure you have installed:
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/limit-order-exchange-mini-engine.git
+git clone https://github.com/ikarolaborda/limit-order-exchange-mini-engine.git
 cd limit-order-exchange-mini-engine
 ```
 
@@ -843,7 +843,7 @@ This project is open-sourced software licensed under the [MIT license](LICENSE).
 <p align="center">
   Built with passion using Laravel, Vue.js, and modern web technologies.
   <br>
-  <a href="https://github.com/your-username/limit-order-exchange-mini-engine/issues">Report Bug</a>
+  <a href="https://github.com/ikarolaborda/limit-order-exchange-mini-engine/issues">Report Bug</a>
   ·
-  <a href="https://github.com/your-username/limit-order-exchange-mini-engine/issues">Request Feature</a>
+  <a href="https://github.com/ikarolaborda/limit-order-exchange-mini-engine/issues">Request Feature</a>
 </p>
