@@ -26,7 +26,7 @@ function setupRealtime(): void {
     store.initEcho((token: string) => {
       const echo = createEcho(token)
       if (echo && store.profile?.id) {
-        echo.private(`user.${store.profile.id}`).listen('.OrderMatched', (payload: unknown) => {
+        echo.private(`private-user.${store.profile.id}`).listen('.OrderMatched', (payload: unknown) => {
           store.handleTrade(payload as Parameters<typeof store.handleTrade>[0])
         })
       }
