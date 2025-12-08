@@ -95,13 +95,8 @@ final class MatchOrderAction
             $buyer->increment('balance', $refund->toString());
         }
 
-        $buyerOrder->locked_usd = 0;
-        $buyerOrder->status = Order::STATUS_FILLED;
-        $buyerOrder->save();
-
-        $sellerOrder->locked_usd = 0;
-        $sellerOrder->status = Order::STATUS_FILLED;
-        $sellerOrder->save();
+        $this->orderRepository->updateStatus($buyerOrder, Order::STATUS_FILLED);
+        $this->orderRepository->updateStatus($sellerOrder, Order::STATUS_FILLED);
 
         $seller->increment('balance', $notional->toString());
 
