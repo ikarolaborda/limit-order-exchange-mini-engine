@@ -33,13 +33,18 @@ final readonly class CachedOrderRepository implements OrderRepositoryInterface
         return $this->repository->findByIdWithLock($id);
     }
 
-    public function getOpenOrdersForSymbol(string $symbol): Collection
+    public function getOpenOrdersForSymbol(string $symbol, ?string $side = null, ?int $status = null): Collection
     {
-        return $this->cache->remember(
-            self::CACHE_PREFIX . "orderbook:{$symbol}",
-            self::CACHE_TTL,
-            fn (): Collection => $this->repository->getOpenOrdersForSymbol($symbol)
-        );
+        // Only cache the default (no filters) case for simplicity
+        if ($side === null && $status === null) {
+            return $this->cache->remember(
+                self::CACHE_PREFIX . "orderbook:{$symbol}",
+                self::CACHE_TTL,
+                fn (): Collection => $this->repository->getOpenOrdersForSymbol($symbol)
+            );
+        }
+
+        return $this->repository->getOpenOrdersForSymbol($symbol, $side, $status);
     }
 
     public function getUserOrders(int $userId): Collection

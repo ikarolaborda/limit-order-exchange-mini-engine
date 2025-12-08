@@ -13,7 +13,7 @@ interface OrderRepositoryInterface
 
     public function findByIdWithLock(int $id): ?Order;
 
-    public function getOpenOrdersForSymbol(string $symbol): Collection;
+    public function getOpenOrdersForSymbol(string $symbol, ?string $side = null, ?int $status = null): Collection;
 
     public function getUserOrders(int $userId): Collection;
 

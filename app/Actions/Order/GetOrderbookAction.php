@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 #[OA\Get(
     path: '/api/orders',
     operationId: 'getOrderbook',
-    description: 'Retrieve all open orders for a specific trading symbol. Orders are sorted by price (ascending for sells, descending for buys) and then by creation time.',
+    description: 'Retrieve orders for a specific trading symbol. By default returns open orders only. Orders are sorted by price and then by creation time.',
     summary: 'Get orderbook',
     tags: ['Orders'],
     parameters: [
@@ -25,6 +25,20 @@ use Symfony\Component\HttpFoundation\Response;
             in: 'query',
             required: true,
             schema: new OA\Schema(type: 'string', enum: ['BTC', 'ETH'], example: 'BTC')
+        ),
+        new OA\Parameter(
+            name: 'side',
+            description: 'Filter by order side',
+            in: 'query',
+            required: false,
+            schema: new OA\Schema(type: 'string', enum: ['buy', 'sell'], example: 'buy')
+        ),
+        new OA\Parameter(
+            name: 'status',
+            description: 'Filter by order status (1=open, 2=filled, 3=cancelled)',
+            in: 'query',
+            required: false,
+            schema: new OA\Schema(type: 'integer', enum: [1, 2, 3], example: 1)
         ),
     ],
     responses: [
@@ -48,15 +62,19 @@ final class GetOrderbookAction
         private readonly OrderRepositoryInterface $orderRepository,
     ) {}
 
-    public function handle(string $symbol): Collection
+    public function handle(string $symbol, ?string $side = null, ?int $status = null): Collection
     {
-        return $this->orderRepository->getOpenOrdersForSymbol($symbol);
+        return $this->orderRepository->getOpenOrdersForSymbol($symbol, $side, $status);
     }
 
     public function asController(GetOrderbookRequest $request): OrderCollection
     {
         $validated = $request->validated();
-        $orders = $this->handle($validated['symbol']);
+        $orders = $this->handle(
+            $validated['symbol'],
+            $validated['side'] ?? null,
+            $validated['status'] ?? null
+        );
 
         return new OrderCollection($orders);
     }

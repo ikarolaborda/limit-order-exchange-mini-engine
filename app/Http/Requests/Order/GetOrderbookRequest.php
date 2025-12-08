@@ -25,6 +25,18 @@ final class GetOrderbookRequest extends FormRequest
                 'string',
                 Rule::in(['BTC', 'ETH']),
             ],
+            'side' => [
+                'sometimes',
+                'nullable',
+                'string',
+                Rule::in(['buy', 'sell']),
+            ],
+            'status' => [
+                'sometimes',
+                'nullable',
+                'integer',
+                Rule::in([1, 2, 3]),
+            ],
         ];
     }
 
@@ -32,6 +44,8 @@ final class GetOrderbookRequest extends FormRequest
     {
         $this->merge([
             'symbol' => strtoupper($this->query('symbol', '')),
+            'side' => $this->query('side') ? strtolower($this->query('side')) : null,
+            'status' => $this->query('status') ? (int) $this->query('status') : null,
         ]);
     }
 }
