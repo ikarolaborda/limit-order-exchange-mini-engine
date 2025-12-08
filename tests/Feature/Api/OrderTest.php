@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class OrderTest extends TestCase
@@ -30,7 +31,8 @@ final class OrderTest extends TestCase
         ]);
     }
 
-    public function test_can_create_buy_order(): void
+    #[Test]
+    public function it_creates_buy_order(): void
     {
         Sanctum::actingAs($this->user);
 
@@ -67,7 +69,8 @@ final class OrderTest extends TestCase
         ]);
     }
 
-    public function test_can_create_sell_order(): void
+    #[Test]
+    public function it_creates_sell_order(): void
     {
         Sanctum::actingAs($this->user);
 
@@ -88,7 +91,8 @@ final class OrderTest extends TestCase
         $this->assertEquals('0.50000000', $asset->locked_amount);
     }
 
-    public function test_cannot_create_buy_order_with_insufficient_balance(): void
+    #[Test]
+    public function it_rejects_buy_order_with_insufficient_balance(): void
     {
         Sanctum::actingAs($this->user);
 
@@ -103,7 +107,8 @@ final class OrderTest extends TestCase
             ->assertJsonValidationErrors(['balance']);
     }
 
-    public function test_cannot_create_sell_order_with_insufficient_asset(): void
+    #[Test]
+    public function it_rejects_sell_order_with_insufficient_asset(): void
     {
         Sanctum::actingAs($this->user);
 
@@ -118,7 +123,8 @@ final class OrderTest extends TestCase
             ->assertJsonValidationErrors(['asset']);
     }
 
-    public function test_validates_symbol_allowlist(): void
+    #[Test]
+    public function it_validates_symbol_against_allowlist(): void
     {
         Sanctum::actingAs($this->user);
 
@@ -133,7 +139,8 @@ final class OrderTest extends TestCase
             ->assertJsonValidationErrors(['symbol']);
     }
 
-    public function test_can_get_orderbook(): void
+    #[Test]
+    public function it_gets_orderbook(): void
     {
         Sanctum::actingAs($this->user);
 
@@ -158,7 +165,8 @@ final class OrderTest extends TestCase
             ]);
     }
 
-    public function test_can_get_my_orders(): void
+    #[Test]
+    public function it_gets_user_orders(): void
     {
         Sanctum::actingAs($this->user);
 
@@ -172,7 +180,8 @@ final class OrderTest extends TestCase
             ->assertJsonCount(3, 'data');
     }
 
-    public function test_can_cancel_own_order(): void
+    #[Test]
+    public function it_cancels_own_order(): void
     {
         Sanctum::actingAs($this->user);
 
@@ -193,7 +202,8 @@ final class OrderTest extends TestCase
         ]);
     }
 
-    public function test_cannot_cancel_other_users_order(): void
+    #[Test]
+    public function it_rejects_cancelling_other_users_order(): void
     {
         Sanctum::actingAs($this->user);
 
@@ -208,4 +218,3 @@ final class OrderTest extends TestCase
         $response->assertStatus(403);
     }
 }
-

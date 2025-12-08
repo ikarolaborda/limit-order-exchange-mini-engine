@@ -6,13 +6,15 @@ namespace Tests\Feature\Api;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_user_can_register(): void
+    #[Test]
+    public function it_allows_user_to_register(): void
     {
         $response = $this->postJson('/api/auth/register', [
             'name' => 'John Doe',
@@ -38,7 +40,8 @@ final class AuthenticationTest extends TestCase
         ]);
     }
 
-    public function test_user_can_login(): void
+    #[Test]
+    public function it_allows_user_to_login(): void
     {
         $user = User::factory()->create([
             'email' => 'john@example.com',
@@ -61,7 +64,8 @@ final class AuthenticationTest extends TestCase
             ]);
     }
 
-    public function test_user_cannot_login_with_invalid_credentials(): void
+    #[Test]
+    public function it_rejects_login_with_invalid_credentials(): void
     {
         User::factory()->create([
             'email' => 'john@example.com',
@@ -77,7 +81,8 @@ final class AuthenticationTest extends TestCase
             ->assertJsonValidationErrors(['email']);
     }
 
-    public function test_user_can_logout(): void
+    #[Test]
+    public function it_allows_user_to_logout(): void
     {
         $user = User::factory()->create();
         $token = $user->createToken('api-token')->plainTextToken;
@@ -89,11 +94,11 @@ final class AuthenticationTest extends TestCase
             ->assertJson(['message' => 'Logged out successfully']);
     }
 
-    public function test_unauthenticated_request_returns_401(): void
+    #[Test]
+    public function it_returns_401_for_unauthenticated_request(): void
     {
         $response = $this->getJson('/api/profile');
 
         $response->assertStatus(401);
     }
 }
-

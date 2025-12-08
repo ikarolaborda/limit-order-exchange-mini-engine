@@ -12,6 +12,7 @@ use App\Models\Order;
 use Illuminate\Validation\ValidationException;
 use Mockery;
 use Mockery\MockInterface;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class CancelOrderActionTest extends TestCase
@@ -42,7 +43,8 @@ final class CancelOrderActionTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_cannot_cancel_filled_order(): void
+    #[Test]
+    public function it_cannot_cancel_filled_order(): void
     {
         $order = new Order([
             'user_id' => 1,
@@ -55,7 +57,8 @@ final class CancelOrderActionTest extends TestCase
         $this->action->handle($order);
     }
 
-    public function test_cannot_cancel_already_cancelled_order(): void
+    #[Test]
+    public function it_cannot_cancel_already_cancelled_order(): void
     {
         $order = new Order([
             'user_id' => 1,

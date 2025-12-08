@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Tests\Unit\Models;
 
 use App\Models\Trade;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 final class TradeTest extends TestCase
 {
-    public function test_fillable_attributes(): void
+    #[Test]
+    public function it_has_fillable_attributes(): void
     {
         $trade = new Trade();
         $fillable = $trade->getFillable();
@@ -22,7 +24,8 @@ final class TradeTest extends TestCase
         $this->assertContains('fee', $fillable);
     }
 
-    public function test_casts_decimal_attributes(): void
+    #[Test]
+    public function it_casts_decimal_attributes(): void
     {
         $trade = new Trade();
         $casts = $trade->getCasts();
@@ -35,4 +38,3 @@ final class TradeTest extends TestCase
         $this->assertSame('decimal:8', $casts['fee']);
     }
 }
-

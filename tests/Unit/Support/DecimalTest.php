@@ -6,12 +6,14 @@ namespace Tests\Unit\Support;
 
 use App\Support\Decimal;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 final class DecimalTest extends TestCase
 {
+    #[Test]
     #[DataProvider('additionProvider')]
-    public function test_addition(string $a, string $b, string $expected): void
+    public function it_performs_addition(string $a, string $b, string $expected): void
     {
         $decimal = Decimal::from($a);
         $result = $decimal->add($b);
@@ -30,8 +32,9 @@ final class DecimalTest extends TestCase
         ];
     }
 
+    #[Test]
     #[DataProvider('subtractionProvider')]
-    public function test_subtraction(string $a, string $b, string $expected): void
+    public function it_performs_subtraction(string $a, string $b, string $expected): void
     {
         $decimal = Decimal::from($a);
         $result = $decimal->sub($b);
@@ -49,8 +52,9 @@ final class DecimalTest extends TestCase
         ];
     }
 
+    #[Test]
     #[DataProvider('multiplicationProvider')]
-    public function test_multiplication(string $a, string $b, string $expected): void
+    public function it_performs_multiplication(string $a, string $b, string $expected): void
     {
         $decimal = Decimal::from($a);
         $result = $decimal->mul($b);
@@ -69,8 +73,9 @@ final class DecimalTest extends TestCase
         ];
     }
 
+    #[Test]
     #[DataProvider('comparisonProvider')]
-    public function test_comparison(string $a, string $b, int $expected): void
+    public function it_performs_comparison(string $a, string $b, int $expected): void
     {
         $decimal = Decimal::from($a);
         $result = $decimal->compare($b);
@@ -89,7 +94,8 @@ final class DecimalTest extends TestCase
         ];
     }
 
-    public function test_is_greater_than(): void
+    #[Test]
+    public function it_checks_is_greater_than(): void
     {
         $decimal = Decimal::from('10');
 
@@ -98,7 +104,8 @@ final class DecimalTest extends TestCase
         $this->assertFalse($decimal->isGreaterThan('15'));
     }
 
-    public function test_is_less_than(): void
+    #[Test]
+    public function it_checks_is_less_than(): void
     {
         $decimal = Decimal::from('10');
 
@@ -107,14 +114,16 @@ final class DecimalTest extends TestCase
         $this->assertTrue($decimal->isLessThan('15'));
     }
 
-    public function test_is_zero(): void
+    #[Test]
+    public function it_checks_is_zero(): void
     {
         $this->assertTrue(Decimal::from('0')->isZero());
         $this->assertTrue(Decimal::from('0.00000000')->isZero());
         $this->assertFalse(Decimal::from('0.00000001')->isZero());
     }
 
-    public function test_is_positive(): void
+    #[Test]
+    public function it_checks_is_positive(): void
     {
         $this->assertTrue(Decimal::from('1')->isPositive());
         $this->assertTrue(Decimal::from('0.00000001')->isPositive());
@@ -122,14 +131,16 @@ final class DecimalTest extends TestCase
         $this->assertFalse(Decimal::from('-1')->isPositive());
     }
 
-    public function test_is_negative(): void
+    #[Test]
+    public function it_checks_is_negative(): void
     {
         $this->assertFalse(Decimal::from('1')->isNegative());
         $this->assertFalse(Decimal::from('0')->isNegative());
         $this->assertTrue(Decimal::from('-1')->isNegative());
     }
 
-    public function test_to_string(): void
+    #[Test]
+    public function it_converts_to_string(): void
     {
         $decimal = Decimal::from('100.50');
 
@@ -137,14 +148,16 @@ final class DecimalTest extends TestCase
         $this->assertSame('100.5', (string) $decimal);
     }
 
-    public function test_from_with_different_types(): void
+    #[Test]
+    public function it_creates_from_different_types(): void
     {
         $this->assertSame('100', Decimal::from(100)->toString());
         $this->assertSame('100.5', Decimal::from(100.5)->toString());
         $this->assertSame('100.5', Decimal::from('100.5')->toString());
     }
 
-    public function test_chained_operations(): void
+    #[Test]
+    public function it_supports_chained_operations(): void
     {
         $result = Decimal::from('100')
             ->mul('1.015')
@@ -154,7 +167,8 @@ final class DecimalTest extends TestCase
         $this->assertSame('106.5', $result->toString());
     }
 
-    public function test_decimal_operations_with_decimal_objects(): void
+    #[Test]
+    public function it_supports_decimal_operations_with_decimal_objects(): void
     {
         $a = Decimal::from('100');
         $b = Decimal::from('50');
@@ -165,4 +179,3 @@ final class DecimalTest extends TestCase
         $this->assertSame(1, $a->compare($b));
     }
 }
-

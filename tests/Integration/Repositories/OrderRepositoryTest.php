@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\User;
 use App\Repositories\Eloquent\EloquentOrderRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class OrderRepositoryTest extends TestCase
@@ -23,7 +24,8 @@ final class OrderRepositoryTest extends TestCase
         $this->repository = new EloquentOrderRepository();
     }
 
-    public function test_find_by_id_returns_order(): void
+    #[Test]
+    public function it_finds_order_by_id(): void
     {
         $user = User::factory()->create();
         $order = Order::factory()->create(['user_id' => $user->id]);
@@ -34,14 +36,16 @@ final class OrderRepositoryTest extends TestCase
         $this->assertEquals($order->id, $found->id);
     }
 
-    public function test_find_by_id_returns_null_for_non_existent(): void
+    #[Test]
+    public function it_returns_null_for_non_existent_order(): void
     {
         $found = $this->repository->findById(99999);
 
         $this->assertNull($found);
     }
 
-    public function test_get_open_orders_for_symbol(): void
+    #[Test]
+    public function it_gets_open_orders_for_symbol(): void
     {
         $user = User::factory()->create();
 
@@ -69,7 +73,8 @@ final class OrderRepositoryTest extends TestCase
         $this->assertEquals('BTC', $orders->first()->symbol);
     }
 
-    public function test_get_user_orders_returns_orders_sorted_by_date(): void
+    #[Test]
+    public function it_gets_user_orders_sorted_by_date(): void
     {
         $user = User::factory()->create();
 
@@ -89,7 +94,8 @@ final class OrderRepositoryTest extends TestCase
         $this->assertEquals($order2->id, $orders->first()->id);
     }
 
-    public function test_create_order(): void
+    #[Test]
+    public function it_creates_order(): void
     {
         $user = User::factory()->create();
 
@@ -110,7 +116,8 @@ final class OrderRepositoryTest extends TestCase
         ]);
     }
 
-    public function test_update_status(): void
+    #[Test]
+    public function it_updates_status(): void
     {
         $user = User::factory()->create();
         $order = Order::factory()->create([
@@ -125,7 +132,8 @@ final class OrderRepositoryTest extends TestCase
         $this->assertEquals(0, $result->locked_usd);
     }
 
-    public function test_find_matching_counter_order_for_buy(): void
+    #[Test]
+    public function it_finds_matching_counter_order_for_buy(): void
     {
         $buyer = User::factory()->create();
         $seller = User::factory()->create();
@@ -161,7 +169,8 @@ final class OrderRepositoryTest extends TestCase
         $this->assertEquals($sellOrder->id, $match->id);
     }
 
-    public function test_find_matching_counter_order_returns_null_when_no_match(): void
+    #[Test]
+    public function it_returns_null_when_no_matching_counter_order(): void
     {
         $buyer = User::factory()->create();
 
@@ -179,4 +188,3 @@ final class OrderRepositoryTest extends TestCase
         $this->assertNull($match);
     }
 }
-

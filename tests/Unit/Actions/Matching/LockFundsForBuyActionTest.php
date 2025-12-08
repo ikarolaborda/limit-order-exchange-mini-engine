@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Validation\ValidationException;
 use Mockery;
 use Mockery\MockInterface;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class LockFundsForBuyActionTest extends TestCase
@@ -38,7 +39,8 @@ final class LockFundsForBuyActionTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_handle_creates_order_with_sufficient_balance(): void
+    #[Test]
+    public function it_creates_order_with_sufficient_balance(): void
     {
         $user = new User(['id' => 1, 'balance' => '100000']);
         $user->id = 1;
@@ -79,7 +81,8 @@ final class LockFundsForBuyActionTest extends TestCase
         $this->assertSame($expectedOrder, $result);
     }
 
-    public function test_handle_throws_exception_with_insufficient_balance(): void
+    #[Test]
+    public function it_throws_exception_with_insufficient_balance(): void
     {
         $user = new User(['id' => 1, 'balance' => '100']);
         $user->id = 1;
@@ -100,7 +103,8 @@ final class LockFundsForBuyActionTest extends TestCase
         ]);
     }
 
-    public function test_handle_calculates_correct_fee(): void
+    #[Test]
+    public function it_calculates_correct_fee(): void
     {
         $user = new User(['id' => 1, 'balance' => '60000']);
         $user->id = 1;

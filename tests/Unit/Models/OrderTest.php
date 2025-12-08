@@ -5,18 +5,21 @@ declare(strict_types=1);
 namespace Tests\Unit\Models;
 
 use App\Models\Order;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 final class OrderTest extends TestCase
 {
-    public function test_status_constants_are_defined(): void
+    #[Test]
+    public function it_has_status_constants_defined(): void
     {
         $this->assertSame(1, Order::STATUS_OPEN);
         $this->assertSame(2, Order::STATUS_FILLED);
         $this->assertSame(3, Order::STATUS_CANCELLED);
     }
 
-    public function test_fillable_attributes(): void
+    #[Test]
+    public function it_has_fillable_attributes(): void
     {
         $order = new Order();
         $fillable = $order->getFillable();
@@ -30,7 +33,8 @@ final class OrderTest extends TestCase
         $this->assertContains('status', $fillable);
     }
 
-    public function test_casts_decimal_attributes(): void
+    #[Test]
+    public function it_casts_decimal_attributes(): void
     {
         $order = new Order([
             'price' => '50000.12345678',
@@ -45,4 +49,3 @@ final class OrderTest extends TestCase
         $this->assertArrayHasKey('locked_usd', $casts);
     }
 }
-

@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Tests\Unit\Models;
 
 use App\Models\Asset;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 final class AssetTest extends TestCase
 {
-    public function test_fillable_attributes(): void
+    #[Test]
+    public function it_has_fillable_attributes(): void
     {
         $asset = new Asset();
         $fillable = $asset->getFillable();
@@ -20,7 +22,8 @@ final class AssetTest extends TestCase
         $this->assertContains('locked_amount', $fillable);
     }
 
-    public function test_casts_decimal_attributes(): void
+    #[Test]
+    public function it_casts_decimal_attributes(): void
     {
         $asset = new Asset();
         $casts = $asset->getCasts();
@@ -31,4 +34,3 @@ final class AssetTest extends TestCase
         $this->assertSame('decimal:8', $casts['locked_amount']);
     }
 }
-

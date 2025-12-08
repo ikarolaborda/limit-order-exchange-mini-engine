@@ -11,6 +11,7 @@ use App\Repositories\Eloquent\EloquentOrderRepository;
 use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class CachedOrderRepositoryTest extends TestCase
@@ -29,7 +30,8 @@ final class CachedOrderRepositoryTest extends TestCase
         );
     }
 
-    public function test_find_by_id_caches_result(): void
+    #[Test]
+    public function it_caches_result_when_finding_by_id(): void
     {
         $user = User::factory()->create();
         $order = Order::factory()->create(['user_id' => $user->id]);
@@ -39,7 +41,8 @@ final class CachedOrderRepositoryTest extends TestCase
         $this->assertTrue(Cache::has("orders:id:{$order->id}"));
     }
 
-    public function test_create_invalidates_cache(): void
+    #[Test]
+    public function it_invalidates_cache_on_create(): void
     {
         $user = User::factory()->create();
 
@@ -59,7 +62,8 @@ final class CachedOrderRepositoryTest extends TestCase
         $this->assertFalse(Cache::has('orders:orderbook:BTC'));
     }
 
-    public function test_update_status_invalidates_cache(): void
+    #[Test]
+    public function it_invalidates_cache_on_status_update(): void
     {
         $user = User::factory()->create();
         $order = Order::factory()->create([
@@ -76,7 +80,8 @@ final class CachedOrderRepositoryTest extends TestCase
         $this->assertFalse(Cache::has("orders:id:{$order->id}"));
     }
 
-    public function test_find_by_id_with_lock_bypasses_cache(): void
+    #[Test]
+    public function it_bypasses_cache_when_finding_with_lock(): void
     {
         $user = User::factory()->create();
         $order = Order::factory()->create(['user_id' => $user->id]);
@@ -86,4 +91,3 @@ final class CachedOrderRepositoryTest extends TestCase
         $this->assertFalse(Cache::has("orders:id:{$order->id}"));
     }
 }
-

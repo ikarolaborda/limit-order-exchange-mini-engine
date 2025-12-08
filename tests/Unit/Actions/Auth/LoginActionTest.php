@@ -12,6 +12,7 @@ use Illuminate\Validation\ValidationException;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\TestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 final class LoginActionTest extends TestCase
 {
@@ -32,7 +33,8 @@ final class LoginActionTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_handle_returns_user_with_valid_credentials(): void
+    #[Test]
+    public function it_handles_returns_user_with_valid_credentials(): void
     {
         $user = new User(['email' => 'john@example.com']);
         $user->setRawAttributes(['password' => 'hashed_password']);
@@ -56,7 +58,8 @@ final class LoginActionTest extends TestCase
         $this->assertSame($user, $result);
     }
 
-    public function test_handle_throws_exception_when_user_not_found(): void
+    #[Test]
+    public function it_throws_exception_when_user_not_found(): void
     {
         $this->userRepository
             ->shouldReceive('findByEmail')
@@ -72,7 +75,8 @@ final class LoginActionTest extends TestCase
         ]);
     }
 
-    public function test_handle_throws_exception_with_invalid_password(): void
+    #[Test]
+    public function it_throws_exception_with_invalid_password(): void
     {
         $user = new User(['email' => 'john@example.com']);
         $user->setRawAttributes(['password' => 'hashed_password']);

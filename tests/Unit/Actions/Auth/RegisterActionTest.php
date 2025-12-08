@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Mockery;
 use Mockery\MockInterface;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class RegisterActionTest extends TestCase
@@ -31,7 +32,8 @@ final class RegisterActionTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_handle_creates_user_with_hashed_password(): void
+    #[Test]
+    public function it_creates_user_with_hashed_password(): void
     {
         Hash::shouldReceive('make')
             ->once()
@@ -73,7 +75,8 @@ final class RegisterActionTest extends TestCase
         $this->assertSame($expectedUser, $result);
     }
 
-    public function test_handle_uses_default_balance_when_not_provided(): void
+    #[Test]
+    public function it_uses_default_balance_when_not_provided(): void
     {
         Hash::shouldReceive('make')
             ->once()

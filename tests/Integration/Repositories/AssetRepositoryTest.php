@@ -8,6 +8,7 @@ use App\Models\Asset;
 use App\Models\User;
 use App\Repositories\Eloquent\EloquentAssetRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class AssetRepositoryTest extends TestCase
@@ -22,7 +23,8 @@ final class AssetRepositoryTest extends TestCase
         $this->repository = new EloquentAssetRepository();
     }
 
-    public function test_find_by_user_and_symbol(): void
+    #[Test]
+    public function it_finds_by_user_and_symbol(): void
     {
         $user = User::factory()->create();
         $asset = Asset::factory()->create([
@@ -36,7 +38,8 @@ final class AssetRepositoryTest extends TestCase
         $this->assertEquals($asset->id, $found->id);
     }
 
-    public function test_find_by_user_and_symbol_returns_null(): void
+    #[Test]
+    public function it_returns_null_when_asset_not_found(): void
     {
         $user = User::factory()->create();
 
@@ -45,7 +48,8 @@ final class AssetRepositoryTest extends TestCase
         $this->assertNull($found);
     }
 
-    public function test_create_or_get_creates_new_asset(): void
+    #[Test]
+    public function it_creates_new_asset_when_not_existing(): void
     {
         $user = User::factory()->create();
 
@@ -59,7 +63,8 @@ final class AssetRepositoryTest extends TestCase
         ]);
     }
 
-    public function test_create_or_get_returns_existing_asset(): void
+    #[Test]
+    public function it_returns_existing_asset_when_already_exists(): void
     {
         $user = User::factory()->create();
         $existingAsset = Asset::factory()->create([
@@ -73,7 +78,8 @@ final class AssetRepositoryTest extends TestCase
         $this->assertEquals($existingAsset->id, $asset->id);
     }
 
-    public function test_lock_amount(): void
+    #[Test]
+    public function it_locks_amount(): void
     {
         $user = User::factory()->create();
         Asset::factory()->create([
@@ -89,7 +95,8 @@ final class AssetRepositoryTest extends TestCase
         $this->assertEquals('2.00000000', $asset->locked_amount);
     }
 
-    public function test_unlock_amount(): void
+    #[Test]
+    public function it_unlocks_amount(): void
     {
         $user = User::factory()->create();
         Asset::factory()->create([
@@ -105,7 +112,8 @@ final class AssetRepositoryTest extends TestCase
         $this->assertEquals('0.00000000', $asset->locked_amount);
     }
 
-    public function test_transfer_amount(): void
+    #[Test]
+    public function it_transfers_amount_between_users(): void
     {
         $sender = User::factory()->create();
         $receiver = User::factory()->create();
@@ -132,4 +140,3 @@ final class AssetRepositoryTest extends TestCase
         ]);
     }
 }
-

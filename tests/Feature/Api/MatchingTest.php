@@ -11,13 +11,15 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Laravel\Sanctum\Sanctum;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class MatchingTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_buy_order_matches_existing_sell_order(): void
+    #[Test]
+    public function it_matches_buy_order_with_existing_sell_order(): void
     {
         Event::fake([OrderMatched::class]);
 
@@ -84,7 +86,8 @@ final class MatchingTest extends TestCase
         $this->assertEquals('0.50000000', $buyerAsset->amount);
     }
 
-    public function test_sell_order_matches_existing_buy_order(): void
+    #[Test]
+    public function it_matches_sell_order_with_existing_buy_order(): void
     {
         Event::fake([OrderMatched::class]);
 
@@ -129,7 +132,8 @@ final class MatchingTest extends TestCase
         Event::assertDispatched(OrderMatched::class);
     }
 
-    public function test_orders_match_at_maker_price(): void
+    #[Test]
+    public function it_matches_orders_at_maker_price(): void
     {
         Event::fake([OrderMatched::class]);
 
@@ -170,7 +174,8 @@ final class MatchingTest extends TestCase
         ]);
     }
 
-    public function test_no_match_when_prices_do_not_cross(): void
+    #[Test]
+    public function it_does_not_match_when_prices_do_not_cross(): void
     {
         Event::fake([OrderMatched::class]);
 
@@ -213,4 +218,3 @@ final class MatchingTest extends TestCase
         Event::assertNotDispatched(OrderMatched::class);
     }
 }
-
