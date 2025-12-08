@@ -95,6 +95,11 @@ function transformTrade(jsonApiTrade: JsonApiTrade): Trade {
   }
 }
 
+interface OrderbookFilters {
+  side: Side | null
+  status: OrderStatus | null
+}
+
 interface ExchangeState {
   token: string
   profile: Profile | null
@@ -108,6 +113,7 @@ interface ExchangeState {
   amount: string
   echo: EchoInstance | null
   exchangeRates: ExchangeRates
+  orderbookFilters: OrderbookFilters
 }
 
 type EchoFactory = (token: string) => EchoInstance | null
@@ -129,6 +135,10 @@ export const useExchangeStore = defineStore('exchange', {
       BTC: null,
       ETH: null,
       lastUpdated: null,
+    },
+    orderbookFilters: {
+      side: null,
+      status: null,
     },
   }),
 
@@ -220,10 +230,25 @@ export const useExchangeStore = defineStore('exchange', {
 
     async fetchOrderbook(): Promise<void> {
       if (!this.token) return
-      const { data } = await axios.get<JsonApiOrderCollection>('/api/orders', {
-        params: { symbol: this.symbol },
-      })
+      const params: Record<string, string | number> = { symbol: this.symbol }
+      if (this.orderbookFilters.side) {
+        params.side = this.orderbookFilters.side
+      }
+      if (this.orderbookFilters.status !== null) {
+        params.status = this.orderbookFilters.status
+      }
+      const { data } = await axios.get<JsonApiOrderCollection>('/api/orders', { params })
       this.orderbook = data.data.map(transformOrder)
+    },
+
+    setOrderbookFilters(filters: Partial<OrderbookFilters>): void {
+      this.orderbookFilters = { ...this.orderbookFilters, ...filters }
+      this.fetchOrderbook()
+    },
+
+    clearOrderbookFilters(): void {
+      this.orderbookFilters = { side: null, status: null }
+      this.fetchOrderbook()
     },
 
     async fetchMyOrders(): Promise<void> {
