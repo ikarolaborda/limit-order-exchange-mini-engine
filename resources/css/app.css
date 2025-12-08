@@ -1,0 +1,209 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.ts';
+@source '../**/*.vue';
+
+@theme {
+  --font-sans: 'Inter', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --radius: 0.5rem;
+}
+
+@layer base {
+  /* Light mode (default) */
+  :root {
+    --background: oklch(0.98 0.005 285);
+    --foreground: oklch(0.14 0.005 285);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.14 0.005 285);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.14 0.005 285);
+    --primary: oklch(0.55 0.19 160);
+    --primary-foreground: oklch(0.98 0.005 285);
+    --secondary: oklch(0.93 0.01 285);
+    --secondary-foreground: oklch(0.14 0.005 285);
+    --muted: oklch(0.93 0.01 285);
+    --muted-foreground: oklch(0.45 0.02 285);
+    --accent: oklch(0.93 0.01 285);
+    --accent-foreground: oklch(0.14 0.005 285);
+    --destructive: oklch(0.55 0.22 25);
+    --destructive-foreground: oklch(0.98 0.005 285);
+    --border: oklch(0.88 0.015 285);
+    --input: oklch(0.88 0.015 285);
+    --ring: oklch(0.55 0.19 160);
+  }
+
+  /* Dark mode */
+  .dark {
+    --background: oklch(0.14 0.005 285);
+    --foreground: oklch(0.97 0.005 285);
+    --card: oklch(0.18 0.008 285);
+    --card-foreground: oklch(0.97 0.005 285);
+    --popover: oklch(0.18 0.008 285);
+    --popover-foreground: oklch(0.97 0.005 285);
+    --primary: oklch(0.72 0.19 160);
+    --primary-foreground: oklch(0.14 0.005 285);
+    --secondary: oklch(0.24 0.01 285);
+    --secondary-foreground: oklch(0.97 0.005 285);
+    --muted: oklch(0.24 0.01 285);
+    --muted-foreground: oklch(0.63 0.02 285);
+    --accent: oklch(0.24 0.01 285);
+    --accent-foreground: oklch(0.97 0.005 285);
+    --destructive: oklch(0.65 0.22 25);
+    --destructive-foreground: oklch(0.97 0.005 285);
+    --border: oklch(0.28 0.015 285);
+    --input: oklch(0.28 0.015 285);
+    --ring: oklch(0.72 0.19 160);
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+}
+
+@layer utilities {
+  .bg-background {
+    background-color: var(--background);
+  }
+  .bg-foreground {
+    background-color: var(--foreground);
+  }
+  .bg-card {
+    background-color: var(--card);
+  }
+  .bg-card-foreground {
+    background-color: var(--card-foreground);
+  }
+  .bg-popover {
+    background-color: var(--popover);
+  }
+  .bg-popover-foreground {
+    background-color: var(--popover-foreground);
+  }
+  .bg-primary {
+    background-color: var(--primary);
+  }
+  .bg-primary-foreground {
+    background-color: var(--primary-foreground);
+  }
+  .bg-secondary {
+    background-color: var(--secondary);
+  }
+  .bg-secondary-foreground {
+    background-color: var(--secondary-foreground);
+  }
+  .bg-muted {
+    background-color: var(--muted);
+  }
+  .bg-muted-foreground {
+    background-color: var(--muted-foreground);
+  }
+  .bg-accent {
+    background-color: var(--accent);
+  }
+  .bg-accent-foreground {
+    background-color: var(--accent-foreground);
+  }
+  .bg-destructive {
+    background-color: var(--destructive);
+  }
+  .bg-destructive-foreground {
+    background-color: var(--destructive-foreground);
+  }
+
+  .text-background {
+    color: var(--background);
+  }
+  .text-foreground {
+    color: var(--foreground);
+  }
+  .text-card {
+    color: var(--card);
+  }
+  .text-card-foreground {
+    color: var(--card-foreground);
+  }
+  .text-popover {
+    color: var(--popover);
+  }
+  .text-popover-foreground {
+    color: var(--popover-foreground);
+  }
+  .text-primary {
+    color: var(--primary);
+  }
+  .text-primary-foreground {
+    color: var(--primary-foreground);
+  }
+  .text-secondary {
+    color: var(--secondary);
+  }
+  .text-secondary-foreground {
+    color: var(--secondary-foreground);
+  }
+  .text-muted {
+    color: var(--muted);
+  }
+  .text-muted-foreground {
+    color: var(--muted-foreground);
+  }
+  .text-accent {
+    color: var(--accent);
+  }
+  .text-accent-foreground {
+    color: var(--accent-foreground);
+  }
+  .text-destructive {
+    color: var(--destructive);
+  }
+  .text-destructive-foreground {
+    color: var(--destructive-foreground);
+  }
+
+  .border-border {
+    border-color: var(--border);
+  }
+  .border-input {
+    border-color: var(--input);
+  }
+  .ring-ring {
+    --tw-ring-color: var(--ring);
+  }
+
+  /* Accordion animations */
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+
+  .animate-accordion-down {
+    animation: accordion-down 0.2s ease-out;
+  }
+
+  .animate-accordion-up {
+    animation: accordion-up 0.2s ease-out;
+  }
+}
