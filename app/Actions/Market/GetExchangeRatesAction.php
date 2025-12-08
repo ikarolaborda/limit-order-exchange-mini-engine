@@ -8,7 +8,23 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Lorisleiva\Actions\Concerns\AsAction;
+use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\Response;
 
+#[OA\Get(
+    path: '/api/exchange-rates',
+    operationId: 'getExchangeRates',
+    description: 'Retrieve current USD exchange rates for supported cryptocurrencies. Rates are fetched from CoinGecko and cached for 2 minutes. Falls back to predefined rates if the external API is unavailable.',
+    summary: 'Get exchange rates',
+    tags: ['Market'],
+    responses: [
+        new OA\Response(
+            response: Response::HTTP_OK,
+            description: 'Exchange rates retrieved successfully',
+            content: new OA\JsonContent(ref: '#/components/schemas/ExchangeRates')
+        ),
+    ]
+)]
 final class GetExchangeRatesAction
 {
     use AsAction;

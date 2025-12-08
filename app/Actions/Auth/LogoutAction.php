@@ -8,8 +8,42 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Lorisleiva\Actions\Concerns\AsAction;
+use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response;
 
+#[OA\Post(
+    path: '/api/auth/logout',
+    operationId: 'logout',
+    description: 'Revoke the current API token or all tokens for the authenticated user.',
+    summary: 'Logout user',
+    security: [['sanctum' => []]],
+    requestBody: new OA\RequestBody(
+        required: false,
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'revoke_all',
+                    description: 'If true, revokes all tokens for the user',
+                    type: 'boolean',
+                    example: false
+                ),
+            ]
+        )
+    ),
+    tags: ['Authentication'],
+    responses: [
+        new OA\Response(
+            response: Response::HTTP_OK,
+            description: 'Logout successful',
+            content: new OA\JsonContent(ref: '#/components/schemas/LogoutResponse')
+        ),
+        new OA\Response(
+            response: Response::HTTP_UNAUTHORIZED,
+            description: 'Unauthenticated',
+            content: new OA\JsonContent(ref: '#/components/schemas/UnauthorizedError')
+        ),
+    ]
+)]
 final class LogoutAction
 {
     use AsAction;

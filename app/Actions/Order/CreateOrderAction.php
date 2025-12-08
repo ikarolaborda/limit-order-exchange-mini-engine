@@ -15,8 +15,38 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Lorisleiva\Actions\Concerns\AsAction;
+use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response;
 
+#[OA\Post(
+    path: '/api/orders',
+    operationId: 'createOrder',
+    description: 'Place a new limit order. For buy orders, USD funds are locked (including 1.5% fee). For sell orders, the asset amount is locked. If a matching order exists at the same or better price, a trade is executed immediately.',
+    summary: 'Create a new order',
+    security: [['sanctum' => []]],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(ref: '#/components/schemas/CreateOrderRequest')
+    ),
+    tags: ['Orders'],
+    responses: [
+        new OA\Response(
+            response: Response::HTTP_CREATED,
+            description: 'Order created successfully',
+            content: new OA\JsonContent(ref: '#/components/schemas/CreateOrderResponse')
+        ),
+        new OA\Response(
+            response: Response::HTTP_UNAUTHORIZED,
+            description: 'Unauthenticated',
+            content: new OA\JsonContent(ref: '#/components/schemas/UnauthorizedError')
+        ),
+        new OA\Response(
+            response: Response::HTTP_UNPROCESSABLE_ENTITY,
+            description: 'Validation error or insufficient funds/assets',
+            content: new OA\JsonContent(ref: '#/components/schemas/ValidationError')
+        ),
+    ]
+)]
 final class CreateOrderAction
 {
     use AsAction;

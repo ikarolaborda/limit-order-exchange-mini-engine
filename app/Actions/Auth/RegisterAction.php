@@ -11,8 +11,32 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Lorisleiva\Actions\Concerns\AsAction;
+use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response;
 
+#[OA\Post(
+    path: '/api/auth/register',
+    operationId: 'register',
+    description: 'Create a new user account and receive a Bearer token for API authentication.',
+    summary: 'Register new user',
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(ref: '#/components/schemas/RegisterRequest')
+    ),
+    tags: ['Authentication'],
+    responses: [
+        new OA\Response(
+            response: Response::HTTP_CREATED,
+            description: 'Registration successful',
+            content: new OA\JsonContent(ref: '#/components/schemas/RegisterResponse')
+        ),
+        new OA\Response(
+            response: Response::HTTP_UNPROCESSABLE_ENTITY,
+            description: 'Validation error',
+            content: new OA\JsonContent(ref: '#/components/schemas/ValidationError')
+        ),
+    ]
+)]
 final class RegisterAction
 {
     use AsAction;
