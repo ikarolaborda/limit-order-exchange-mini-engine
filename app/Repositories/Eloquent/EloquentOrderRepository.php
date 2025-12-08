@@ -20,11 +20,13 @@ final class EloquentOrderRepository implements OrderRepositoryInterface
         return Order::whereKey($id)->lockForUpdate()->first();
     }
 
-    public function getOpenOrdersForSymbol(string $symbol): Collection
+    public function getOpenOrdersForSymbol(string $symbol, ?string $side = null, ?int $status = null): Collection
     {
         return Order::query()
             ->where('symbol', $symbol)
-            ->open()
+            ->when($status !== null, fn ($q) => $q->where('status', $status), fn ($q) => $q->open())
+            ->when($side !== null, fn ($q) => $q->where('side', $side))
+            ->orderBy('price')
             ->orderBy('created_at')
             ->get();
     }
@@ -64,8 +66,8 @@ final class EloquentOrderRepository implements OrderRepositoryInterface
             ->where('amount', $order->amount)
             ->when(
                 $order->side === 'buy',
-                fn ($q) => $q->where('price', '<=', $order->price),
-                fn ($q) => $q->where('price', '>=', $order->price)
+                fn ($q) => $q->where('price', '<=', $order->price)->orderBy('price', 'asc'),
+                fn ($q) => $q->where('price', '>=', $order->price)->orderBy('price', 'desc')
             )
             ->orderBy('created_at')
             ->lockForUpdate()
