@@ -205,7 +205,7 @@ final class OrderTest extends TestCase
 
         $response = $this->postJson("/api/orders/{$order->id}/cancel");
 
-        $response->assertStatus(422);
+        $response->assertStatus(403);
     }
 }
 

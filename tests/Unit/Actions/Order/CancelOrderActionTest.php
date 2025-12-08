@@ -9,7 +9,6 @@ use App\Contracts\Repositories\AssetRepositoryInterface;
 use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Models\Order;
-use App\Models\User;
 use Illuminate\Validation\ValidationException;
 use Mockery;
 use Mockery\MockInterface;
@@ -43,26 +42,8 @@ final class CancelOrderActionTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_cannot_cancel_order_owned_by_another_user(): void
-    {
-        $user = new User(['id' => 1]);
-        $user->id = 1;
-
-        $order = new Order([
-            'user_id' => 2,
-            'status' => Order::STATUS_OPEN,
-        ]);
-
-        $this->expectException(ValidationException::class);
-
-        $this->action->handle($user, $order);
-    }
-
     public function test_cannot_cancel_filled_order(): void
     {
-        $user = new User(['id' => 1]);
-        $user->id = 1;
-
         $order = new Order([
             'user_id' => 1,
             'status' => Order::STATUS_FILLED,
@@ -71,14 +52,11 @@ final class CancelOrderActionTest extends TestCase
 
         $this->expectException(ValidationException::class);
 
-        $this->action->handle($user, $order);
+        $this->action->handle($order);
     }
 
     public function test_cannot_cancel_already_cancelled_order(): void
     {
-        $user = new User(['id' => 1]);
-        $user->id = 1;
-
         $order = new Order([
             'user_id' => 1,
             'status' => Order::STATUS_CANCELLED,
@@ -87,7 +65,7 @@ final class CancelOrderActionTest extends TestCase
 
         $this->expectException(ValidationException::class);
 
-        $this->action->handle($user, $order);
+        $this->action->handle($order);
     }
 }
 
