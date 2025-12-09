@@ -62,4 +62,20 @@ final class User extends Authenticatable
     {
         return $this->hasMany(Order::class);
     }
+
+    /**
+     * @return HasMany<UserWallet, $this>
+     */
+    public function wallets(): HasMany
+    {
+        return $this->hasMany(UserWallet::class);
+    }
+
+    /**
+     * @return HasMany<BlockchainTransaction, $this>
+     */
+    public function blockchainTransactions(): HasMany
+    {
+        return $this->hasMany(BlockchainTransaction::class);
+    }
 }

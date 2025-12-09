@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'web3' => [
+        'url' => env('WEB3_SERVICE_URL', 'http://web3-service:8081'),
+        'api_key' => env('WEB3_SERVICE_API_KEY', ''),
+    ],
+
 ];

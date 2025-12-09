@@ -16,6 +16,12 @@ use App\Actions\Order\GetMyOrdersAction;
 use App\Actions\Order\GetOrderbookAction;
 use App\Actions\Profile\ShowProfileAction;
 use App\Actions\Trade\GetTradesAction;
+use App\Actions\Web3\CreateWalletAction;
+use App\Actions\Web3\GetTransactionStatusAction;
+use App\Actions\Web3\GetWalletBalanceAction;
+use App\Actions\Web3\ListUserTransactionsAction;
+use App\Actions\Web3\ListUserWalletsAction;
+use App\Actions\Web3\SendTransactionAction;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/register', RegisterAction::class)->name('api.auth.register');
@@ -35,4 +41,13 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/notifications', GetNotificationsAction::class)->name('api.notifications.index');
     Route::post('/notifications/{notification}/read', MarkNotificationReadAction::class)->name('api.notifications.read');
     Route::post('/notifications/read-all', MarkAllNotificationsReadAction::class)->name('api.notifications.read-all');
+
+    Route::prefix('web3')->group(function (): void {
+        Route::get('/wallets', ListUserWalletsAction::class)->name('api.web3.wallets.index');
+        Route::post('/wallets', CreateWalletAction::class)->name('api.web3.wallets.store');
+        Route::get('/wallets/{wallet}/balance', GetWalletBalanceAction::class)->name('api.web3.wallets.balance');
+        Route::get('/transactions', ListUserTransactionsAction::class)->name('api.web3.transactions.index');
+        Route::post('/transactions', SendTransactionAction::class)->name('api.web3.transactions.store');
+        Route::get('/transactions/{transaction}', GetTransactionStatusAction::class)->name('api.web3.transactions.show');
+    });
 });

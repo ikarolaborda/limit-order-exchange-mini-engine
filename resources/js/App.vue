@@ -10,6 +10,7 @@ import { ExchangeRates } from '@/components/market'
 import { LoginForm } from '@/components/auth'
 import { TradingInfo } from '@/components/info'
 import { NotificationBell } from '@/components/notification'
+import { WalletCard, SendTransactionForm, TransactionHistory } from '@/components/web3'
 
 const store = useExchangeStore()
 
@@ -123,6 +124,15 @@ watch(
 
         <section>
           <TradingInfo />
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="text-xl font-semibold">Web3 / Ethereum</h2>
+          <div class="grid gap-4 md:grid-cols-3">
+            <WalletCard />
+            <SendTransactionForm />
+            <TransactionHistory />
+          </div>
         </section>
       </div>
       <Toaster position="top-right" :duration="4000" rich-colors />

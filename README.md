@@ -9,7 +9,9 @@
   <img src="https://img.shields.io/badge/Laravel-12-FF2D20?style=flat-square&logo=laravel" alt="Laravel 12">
   <img src="https://img.shields.io/badge/Vue.js-3.5-4FC08D?style=flat-square&logo=vuedotjs" alt="Vue 3.5">
   <img src="https://img.shields.io/badge/TypeScript-5.6-3178C6?style=flat-square&logo=typescript" alt="TypeScript 5.6">
+  <img src="https://img.shields.io/badge/Go-1.23-00ADD8?style=flat-square&logo=go" alt="Go 1.23">
   <img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat-square&logo=postgresql" alt="PostgreSQL 16">
+  <img src="https://img.shields.io/badge/Ethereum-Ganache-3C3C3D?style=flat-square&logo=ethereum" alt="Ethereum">
   <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="MIT License">
 </p>
 
@@ -22,6 +24,8 @@
 - [Quick Start Guide](#quick-start-guide)
 - [Architecture Overview](#architecture-overview)
 - [Infrastructure & Services](#infrastructure--services)
+- [Web3 / Ethereum Integration](#web3--ethereum-integration)
+- [Notification System](#notification-system)
 - [Design Patterns & Principles](#design-patterns--principles)
 - [Frontend Components](#frontend-components)
 - [API Reference](#api-reference)
@@ -66,6 +70,13 @@ The **Limit Order Exchange Mini Engine** is an educational and demonstration pro
 - **WebSocket Broadcasting**: Instant updates when orders are placed, matched, or cancelled
 - **Live Orderbook**: See bid/ask depth update in real-time
 - **Trade Notifications**: Toast notifications for successful trades
+- **Offline Notifications**: Database-persisted notifications for trades that occur while logged out
+
+### Web3 / Blockchain
+- **Ethereum Wallet Management**: Create and manage Ethereum wallets
+- **ETH Transactions**: Send ETH via Go-based Web3 microservice
+- **Local Blockchain**: Ganache for development with pre-funded accounts
+- **Secure Key Storage**: Private keys never leave the Go service
 
 ### Security
 - **Token-Based Auth**: Laravel Sanctum for secure API authentication
@@ -277,6 +288,8 @@ resources/js/
 | **soketi** | soketi:1.6 | 6001 | WebSocket server (Pusher-compatible) |
 | **node** | node:22-alpine | - | Frontend build tooling |
 | **queue** | Custom (FrankenPHP) | - | Background job processing |
+| **ganache** | trufflesuite/ganache | 8545 | Local Ethereum blockchain |
+| **web3-service** | Custom (Go 1.23) | 8081 (internal) | Ethereum wallet & transaction service |
 
 ### Why These Technologies?
 
@@ -320,6 +333,229 @@ PUSHER_APP_SECRET=app-secret
 VITE_PUSHER_APP_KEY=app-key
 VITE_PUSHER_HOST=localhost
 VITE_PUSHER_PORT=6001
+```
+
+---
+
+## Web3 / Ethereum Integration
+
+The platform includes a complete Web3/Ethereum integration via a dedicated Go microservice. This architecture separates blockchain concerns from the main application while providing secure wallet management and transaction capabilities.
+
+### Architecture
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         Laravel Application                               │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐      │
+│  │  Web3Service    │    │  CreateWallet   │    │  SendTransaction│      │
+│  │  (HTTP Client)  │    │  Action         │    │  Action         │      │
+│  └────────┬────────┘    └────────┬────────┘    └────────┬────────┘      │
+│           │                      │                      │                │
+│           └──────────────────────┴──────────────────────┘                │
+│                                  │ HTTP (Internal Network)               │
+└──────────────────────────────────┼───────────────────────────────────────┘
+                                   │
+┌──────────────────────────────────▼───────────────────────────────────────┐
+│                         Go Web3 Service (Gin)                             │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐      │
+│  │  WalletHandler  │    │  WalletService  │    │  KeyStore       │      │
+│  │  (HTTP Layer)   │───►│  (Business)     │───►│  (go-ethereum)  │      │
+│  └─────────────────┘    └─────────────────┘    └─────────────────┘      │
+│           │                      │                      │                │
+│           └──────────────────────┴──────────────────────┘                │
+│                                  │ JSON-RPC                              │
+└──────────────────────────────────┼───────────────────────────────────────┘
+                                   │
+┌──────────────────────────────────▼───────────────────────────────────────┐
+│                    Ganache (Local Ethereum Blockchain)                    │
+│  • Chain ID: 1337                                                        │
+│  • Pre-funded accounts with 1000 ETH each                                │
+│  • 1 second block time                                                   │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+### Go Service Features
+
+| Feature | Description |
+|---------|-------------|
+| **Wallet Creation** | Generate new Ethereum wallets with encrypted keystores |
+| **Balance Queries** | Check ETH balance for any address |
+| **Send Transactions** | Send ETH between addresses with gas estimation |
+| **Transaction Status** | Query transaction receipts and confirmation status |
+| **API Key Auth** | Secure internal communication with API key middleware |
+
+### Go Project Structure
+
+```
+web3-service/
+├── cmd/
+│   └── api/
+│       └── main.go           # Entry point, dependency injection
+├── internal/
+│   ├── config/
+│   │   └── config.go         # Environment configuration
+│   ├── domain/
+│   │   ├── wallet.go         # Wallet DTOs
+│   │   └── transaction.go    # Transaction DTOs
+│   ├── ethereum/
+│   │   ├── client.go         # go-ethereum wrapper
+│   │   └── keystore.go       # Key management
+│   ├── handler/
+│   │   ├── health.go         # Health check endpoint
+│   │   ├── wallet.go         # Wallet HTTP handlers
+│   │   └── transaction.go    # Transaction HTTP handlers
+│   ├── middleware/
+│   │   └── auth.go           # API key authentication
+│   └── service/
+│       ├── wallet_service.go # Wallet business logic
+│       └── transaction_service.go
+└── docker/
+    └── Dockerfile            # Multi-stage Go build
+```
+
+### API Endpoints (Go Service)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/health` | Service health + Ethereum connectivity |
+| `POST` | `/api/v1/wallets` | Create new wallet |
+| `GET` | `/api/v1/wallets/:address/balance` | Get ETH balance |
+| `POST` | `/api/v1/transactions` | Send ETH transaction |
+| `GET` | `/api/v1/transactions/:hash` | Get transaction status |
+
+### Laravel Integration
+
+The Laravel application communicates with the Go service via HTTP:
+
+```php
+// Create a wallet
+$action = app(CreateWalletAction::class);
+$wallet = $action->handle($user, 'secure-password');
+
+// Check balance
+$action = app(GetWalletBalanceAction::class);
+$balance = $action->handle($walletAddress);
+
+// Send transaction
+$action = app(SendTransactionAction::class);
+$tx = $action->handle($user, $fromAddress, $toAddress, '0.1', 'password');
+```
+
+### Vue Components
+
+| Component | Description |
+|-----------|-------------|
+| `WalletCard` | Create wallets, view addresses and balances |
+| `SendTransactionForm` | Form to send ETH between addresses |
+| `TransactionHistory` | List of user's blockchain transactions |
+
+### Running the Web3 Stack
+
+The Web3 services start automatically with Docker Compose:
+
+```bash
+make up  # Starts all services including Ganache and web3-service
+```
+
+To test the Go service directly:
+
+```bash
+# Health check
+curl http://localhost:8081/health
+
+# Create wallet (requires API key)
+curl -X POST http://localhost:8081/api/v1/wallets \
+  -H "X-API-Key: web3-secret-key" \
+  -H "Content-Type: application/json" \
+  -d '{"password": "my-secure-password"}'
+
+# Check balance
+curl http://localhost:8081/api/v1/wallets/0x.../balance \
+  -H "X-API-Key: web3-secret-key"
+```
+
+---
+
+## Notification System
+
+The platform includes a comprehensive notification system that ensures users never miss important trading events, even when offline.
+
+### How It Works
+
+1. **Order Matched**: When orders are matched, the matching engine triggers a notification
+2. **Real-time Delivery**: If the user is online, they receive an instant WebSocket notification
+3. **Database Persistence**: Notifications are also stored in the database for offline users
+4. **Login Retrieval**: When users log in, any unread notifications are displayed as toast messages
+
+### Notification Flow
+
+```
+Order Matched
+     │
+     ▼
+┌────────────────┐
+│ MatchOrders    │
+│ Action         │
+└───────┬────────┘
+        │
+        ▼
+┌────────────────┐     ┌────────────────┐
+│ OrderMatched   │────►│ Notification   │
+│ Event          │     │ (Database)     │
+└───────┬────────┘     └────────────────┘
+        │
+        ▼
+┌────────────────┐
+│ Private        │
+│ WebSocket      │
+│ Channel        │
+└───────┬────────┘
+        │
+        ▼
+   User's Browser
+   (Toast Message)
+```
+
+### Key Components
+
+| Component | Purpose |
+|-----------|---------|
+| `OrderFilledNotification` | Laravel notification class with database channel |
+| `OrderMatched` event | Broadcasts to private user channels |
+| `NotificationBell` component | Shows unread count, lists notifications |
+| `showPendingNotifications()` | Displays missed notifications on login |
+
+### Notification Channels
+
+- **Database**: Persistent storage for offline retrieval
+- **WebSocket**: Real-time delivery via private channels (`private-user.{id}`)
+
+### User Experience
+
+**Online Users:**
+- Instant toast notification when their order is filled
+- Badge updates on notification bell
+- Click to view details
+
+**Offline Users:**
+- Notifications stored in database
+- On login: summary toast if >3 notifications, individual toasts if ≤3
+- All notifications accessible via bell icon
+
+### API Endpoints
+
+```http
+# Get unread notifications
+GET /api/notifications
+Authorization: Bearer {token}
+
+# Mark notification as read
+POST /api/notifications/{id}/read
+Authorization: Bearer {token}
+
+# Mark all as read
+POST /api/notifications/read-all
+Authorization: Bearer {token}
 ```
 
 ---
@@ -487,6 +723,15 @@ $withFee = $total->mul($fee->add('1'));  // 21568.75
 | `ExchangeRates` | Live BTC/ETH prices from CoinGecko |
 | `UserCard` | Display user name and USD balance |
 | `AssetList` | Portfolio holdings (BTC, ETH amounts) |
+| `NotificationBell` | Notification center with unread count badge |
+
+### Web3 Components
+
+| Component | Purpose |
+|-----------|---------|
+| `WalletCard` | Create Ethereum wallets and view balances |
+| `SendTransactionForm` | Send ETH to other addresses |
+| `TransactionHistory` | View blockchain transaction history |
 
 ---
 
@@ -588,6 +833,77 @@ Response:
   "source": "coingecko",
   "cached_at": "2025-01-01T12:00:00Z"
 }
+```
+
+### Web3 Endpoints
+
+#### Create Wallet
+```http
+POST /api/web3/wallets
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "password": "secure-wallet-password"
+}
+```
+
+#### List User Wallets
+```http
+GET /api/web3/wallets
+Authorization: Bearer {token}
+```
+
+#### Get Wallet Balance
+```http
+GET /api/web3/wallets/{address}/balance
+Authorization: Bearer {token}
+```
+
+#### Send Transaction
+```http
+POST /api/web3/transactions
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "from_address": "0x...",
+  "to_address": "0x...",
+  "amount": "0.1",
+  "password": "wallet-password"
+}
+```
+
+#### Get Transaction Status
+```http
+GET /api/web3/transactions/{hash}
+Authorization: Bearer {token}
+```
+
+#### List User Transactions
+```http
+GET /api/web3/transactions
+Authorization: Bearer {token}
+```
+
+### Notification Endpoints
+
+#### Get Notifications
+```http
+GET /api/notifications
+Authorization: Bearer {token}
+```
+
+#### Mark as Read
+```http
+POST /api/notifications/{id}/read
+Authorization: Bearer {token}
+```
+
+#### Mark All as Read
+```http
+POST /api/notifications/read-all
+Authorization: Bearer {token}
 ```
 
 ---
@@ -841,7 +1157,7 @@ This project is open-sourced software licensed under the [MIT license](LICENSE).
 ---
 
 <p align="center">
-  Built with passion using Laravel, Vue.js, and modern web technologies.
+  Built with passion using Laravel, Vue.js, Go, and modern web technologies.
   <br>
   <a href="https://github.com/ikarolaborda/limit-order-exchange-mini-engine/issues">Report Bug</a>
   ·

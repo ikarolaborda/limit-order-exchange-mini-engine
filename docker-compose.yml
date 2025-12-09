@@ -85,7 +85,38 @@ services:
       timeout: 3s
       retries: 5
 
+  ganache:
+    image: trufflesuite/ganache:latest
+    ports:
+      - "8545:8545"
+    command: >
+      --chain.chainId 1337
+      --wallet.totalAccounts 10
+      --wallet.defaultBalance 1000
+      --miner.blockTime 1
+      --database.dbPath /ganache-data
+    volumes:
+      - ganache-data:/ganache-data
+
+  web3-service:
+    build:
+      context: ../web3-service
+      dockerfile: docker/Dockerfile
+    environment:
+      - SERVER_PORT=8081
+      - SERVER_ENV=development
+      - ETHEREUM_RPC_URL=http://ganache:8545
+      - ETHEREUM_CHAIN_ID=1337
+      - ETHEREUM_KEYSTORE_DIR=/app/keystore
+      - API_KEY=${WEB3_SERVICE_API_KEY:-web3-secret-key}
+    volumes:
+      - web3-keystore:/app/keystore
+    depends_on:
+      - ganache
+
 volumes:
   db-data:
   redis-data:
+  ganache-data:
+  web3-keystore:
 
