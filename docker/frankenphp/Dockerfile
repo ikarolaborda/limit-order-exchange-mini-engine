@@ -13,7 +13,9 @@ RUN install-php-extensions \
     bcmath \
     redis \
     opcache \
-    zip
+    zip \
+    ffi \
+    gd
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -53,7 +55,9 @@ RUN install-php-extensions \
     pdo_pgsql \
     bcmath \
     redis \
-    opcache
+    opcache \
+    ffi \
+    gd
 
 COPY --from=builder /app /app
 

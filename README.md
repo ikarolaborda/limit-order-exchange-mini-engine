@@ -12,6 +12,7 @@
   <img src="https://img.shields.io/badge/Go-1.23-00ADD8?style=flat-square&logo=go" alt="Go 1.23">
   <img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat-square&logo=postgresql" alt="PostgreSQL 16">
   <img src="https://img.shields.io/badge/Ethereum-Ganache-3C3C3D?style=flat-square&logo=ethereum" alt="Ethereum">
+  <img src="https://img.shields.io/badge/AI-TransformersPHP-FF6F00?style=flat-square&logo=openai" alt="AI TransformersPHP">
   <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="MIT License">
 </p>
 
@@ -25,6 +26,7 @@
 - [Architecture Overview](#architecture-overview)
 - [Infrastructure & Services](#infrastructure--services)
 - [Web3 / Ethereum Integration](#web3--ethereum-integration)
+- [AI-Powered Insights](#ai-powered-insights)
 - [Notification System](#notification-system)
 - [Design Patterns & Principles](#design-patterns--principles)
 - [Frontend Components](#frontend-components)
@@ -77,6 +79,12 @@ The **Limit Order Exchange Mini Engine** is an educational and demonstration pro
 - **ETH Transactions**: Send ETH via Go-based Web3 microservice
 - **Local Blockchain**: Ganache for development with pre-funded accounts
 - **Secure Key Storage**: Private keys never leave the Go service
+
+### AI-Powered Analysis
+- **Sentiment Analysis**: Analyze crypto news sentiment using TransformersPHP
+- **Market Insights**: Get AI-generated trading recommendations based on news
+- **Zero-Shot Classification**: Categorize news into relevant topics (earnings, regulation, adoption, etc.)
+- **ONNX Runtime**: Runs ML models locally via ONNX without external API calls
 
 ### Security
 - **Token-Based Auth**: Laravel Sanctum for secure API authentication
@@ -476,6 +484,134 @@ curl http://localhost:8081/api/v1/wallets/0x.../balance \
 
 ---
 
+## AI-Powered Insights
+
+The platform includes AI-powered analysis capabilities using TransformersPHP, enabling on-device machine learning inference without external API dependencies.
+
+### How It Works
+
+TransformersPHP runs ONNX models locally using the FFI extension, providing:
+- No external API costs or rate limits
+- Privacy-preserving analysis (data never leaves your server)
+- Low latency responses with result caching
+- Support for multiple NLP tasks
+
+### Available AI Features
+
+| Feature | Description | Use Case |
+|---------|-------------|----------|
+| **Sentiment Analysis** | Classifies text as positive/negative/neutral | Quick market mood assessment |
+| **Market Insights** | Combines sentiment with topic classification | Trading recommendations |
+| **Text Classification** | Zero-shot classification into custom categories | News categorization |
+| **Batch Processing** | Analyze multiple texts efficiently | Bulk news analysis |
+
+### Architecture
+
+```
+┌────────────────────────────────────────────────────────────────────┐
+│                      Vue.js Frontend                                │
+│  ┌────────────────────────────────────────────────────────────┐   │
+│  │  AIInsights Component                                       │   │
+│  │  - News text input                                          │   │
+│  │  - Symbol selection (BTC/ETH)                               │   │
+│  │  - Sentiment visualization                                  │   │
+│  │  - Category badges                                          │   │
+│  └────────────────────────────────────────────────────────────┘   │
+└───────────────────────────────┬────────────────────────────────────┘
+                                │ HTTP POST
+┌───────────────────────────────▼────────────────────────────────────┐
+│                     Laravel Backend                                 │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐    │
+│  │ AIInsightsService │  │ Action Classes  │  │  Redis Cache   │    │
+│  │ (Pipeline Mgmt)  │  │ (HTTP Adapters) │  │  (1hr TTL)     │    │
+│  └────────┬────────┘  └─────────────────┘  └─────────────────┘    │
+│           │                                                         │
+│  ┌────────▼────────────────────────────────────────────────────┐   │
+│  │            TransformersPHP (ONNX Runtime via FFI)            │   │
+│  │  ┌───────────────┐  ┌────────────────────────────────────┐  │   │
+│  │  │ Sentiment     │  │ Zero-Shot Classification           │  │   │
+│  │  │ Pipeline      │  │ Pipeline (mobilebert-uncased-mnli) │  │   │
+│  │  └───────────────┘  └────────────────────────────────────┘  │   │
+│  └──────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### API Endpoints
+
+#### Analyze Sentiment
+```http
+POST /api/ai/sentiment
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "text": "Bitcoin surges to new all-time highs!"
+}
+```
+
+Response:
+```json
+{
+  "data": {
+    "type": "sentiment_analysis",
+    "attributes": {
+      "text": "Bitcoin surges to new all-time highs!",
+      "label": "POSITIVE",
+      "score": 0.9964,
+      "sentiment": "positive",
+      "confidence": 99.64
+    }
+  }
+}
+```
+
+#### Get Market Insight
+```http
+POST /api/ai/market-insight
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "symbol": "BTC",
+  "news_text": "Major financial institutions adopt Bitcoin for treasury reserves..."
+}
+```
+
+Response:
+```json
+{
+  "data": {
+    "type": "market_insight",
+    "attributes": {
+      "symbol": "BTC",
+      "sentiment": {
+        "label": "POSITIVE",
+        "score": 0.99,
+        "sentiment": "positive"
+      },
+      "recommendation": "bullish",
+      "categories": [
+        {"label": "adoption", "score": 0.45},
+        {"label": "technology", "score": 0.15}
+      ],
+      "summary": "The news about BTC shows positive sentiment (99% confidence) and relates to adoption topics."
+    }
+  }
+}
+```
+
+### Dependencies
+
+The AI features require PHP's FFI and GD extensions, which are included in the Docker image:
+
+```dockerfile
+RUN install-php-extensions ffi gd
+```
+
+Models are automatically downloaded on first use and cached locally.
+
+---
+
 ## Notification System
 
 The platform includes a comprehensive notification system that ensures users never miss important trading events, even when offline.
@@ -732,6 +868,12 @@ $withFee = $total->mul($fee->add('1'));  // 21568.75
 | `WalletCard` | Create Ethereum wallets and view balances |
 | `SendTransactionForm` | Send ETH to other addresses |
 | `TransactionHistory` | View blockchain transaction history |
+
+### AI Components
+
+| Component | Purpose |
+|-----------|---------|
+| `AIInsights` | Analyze crypto news with sentiment analysis and market insights |
 
 ---
 

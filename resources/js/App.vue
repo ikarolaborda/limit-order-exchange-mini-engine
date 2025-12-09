@@ -11,6 +11,7 @@ import { LoginForm } from '@/components/auth'
 import { TradingInfo } from '@/components/info'
 import { NotificationBell } from '@/components/notification'
 import { WalletCard, SendTransactionForm, TransactionHistory } from '@/components/web3'
+import { AIInsights } from '@/components/ai'
 
 const store = useExchangeStore()
 
@@ -132,6 +133,13 @@ watch(
             <WalletCard />
             <SendTransactionForm />
             <TransactionHistory />
+          </div>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="text-xl font-semibold">AI-Powered Analysis</h2>
+          <div class="grid gap-4 md:grid-cols-2">
+            <AIInsights />
           </div>
         </section>
       </div>
