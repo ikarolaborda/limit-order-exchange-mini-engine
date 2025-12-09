@@ -11,7 +11,7 @@ import { LoginForm } from '@/components/auth'
 import { TradingInfo } from '@/components/info'
 import { NotificationBell } from '@/components/notification'
 import { WalletCard, SendTransactionForm, TransactionHistory } from '@/components/web3'
-import { AIInsights } from '@/components/ai'
+import { AIInsights, MarketSentiment } from '@/components/ai'
 
 const store = useExchangeStore()
 
@@ -111,6 +111,10 @@ watch(
         <section v-if="store.profile" class="grid gap-4 md:grid-cols-3">
           <UserCard />
           <AssetList />
+        </section>
+
+        <section class="rounded-lg border bg-card p-4">
+          <MarketSentiment />
         </section>
 
         <section class="grid gap-4 md:grid-cols-3">

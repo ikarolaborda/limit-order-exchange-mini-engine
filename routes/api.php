@@ -25,6 +25,7 @@ use App\Actions\Web3\SendTransactionAction;
 use App\Actions\AI\AnalyzeSentimentAction;
 use App\Actions\AI\AnalyzeSentimentBatchAction;
 use App\Actions\AI\GetMarketInsightAction;
+use App\Actions\AI\GetMarketSentimentAction;
 use App\Actions\AI\ClassifyTextAction;
 use Illuminate\Support\Facades\Route;
 
@@ -59,6 +60,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
         Route::post('/sentiment', AnalyzeSentimentAction::class)->name('api.ai.sentiment');
         Route::post('/sentiment/batch', AnalyzeSentimentBatchAction::class)->name('api.ai.sentiment.batch');
         Route::post('/market-insight', GetMarketInsightAction::class)->name('api.ai.market-insight');
+        Route::get('/market-sentiment', GetMarketSentimentAction::class)->name('api.ai.market-sentiment');
         Route::post('/classify', ClassifyTextAction::class)->name('api.ai.classify');
     });
 });

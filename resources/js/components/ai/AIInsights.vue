@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import axios from 'axios'
 import { useExchangeStore } from '@/stores/exchange'
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Label, Textarea, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Badge } from '@/components/ui'
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Label, Textarea, Select, Badge } from '@/components/ui'
 
 interface SentimentResult {
   text: string
@@ -31,15 +31,13 @@ const error = ref('')
 
 const canAnalyze = computed(() => newsText.value.trim().length >= 20)
 
-const recommendationColor = computed(() => {
+const recommendationVariant = computed(() => {
   if (!marketInsight.value) return 'secondary'
   switch (marketInsight.value.recommendation) {
     case 'bullish':
-      return 'default'
     case 'slightly_bullish':
       return 'default'
     case 'bearish':
-      return 'destructive'
     case 'slightly_bearish':
       return 'destructive'
     default:
@@ -118,7 +116,6 @@ function loadSampleNews(index: number): void {
   <Card class="h-full">
     <CardHeader>
       <CardTitle class="flex items-center gap-2">
-        <span class="i-lucide-brain h-5 w-5" />
         AI Market Insights
       </CardTitle>
       <CardDescription>
@@ -128,14 +125,9 @@ function loadSampleNews(index: number): void {
     <CardContent class="space-y-4">
       <div class="space-y-2">
         <Label>Select Symbol</Label>
-        <Select v-model="selectedSymbol">
-          <SelectTrigger class="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="BTC">Bitcoin (BTC)</SelectItem>
-            <SelectItem value="ETH">Ethereum (ETH)</SelectItem>
-          </SelectContent>
+        <Select v-model="selectedSymbol" class="w-full">
+          <option value="BTC">Bitcoin (BTC)</option>
+          <option value="ETH">Ethereum (ETH)</option>
         </Select>
       </div>
 
@@ -190,7 +182,7 @@ function loadSampleNews(index: number): void {
       <div v-if="marketInsight" class="space-y-4 rounded-lg border p-4">
         <div class="flex items-center justify-between">
           <h4 class="font-semibold">Analysis Results</h4>
-          <Badge :variant="recommendationColor">
+          <Badge :variant="recommendationVariant">
             {{ recommendationLabel }}
           </Badge>
         </div>
