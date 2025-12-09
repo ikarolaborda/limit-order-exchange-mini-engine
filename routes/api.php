@@ -6,6 +6,9 @@ use App\Actions\Auth\LoginAction;
 use App\Actions\Auth\LogoutAction;
 use App\Actions\Auth\RegisterAction;
 use App\Actions\Market\GetExchangeRatesAction;
+use App\Actions\Notification\GetNotificationsAction;
+use App\Actions\Notification\MarkAllNotificationsReadAction;
+use App\Actions\Notification\MarkNotificationReadAction;
 use App\Actions\Matching\MatchOrderAction;
 use App\Actions\Order\CancelOrderAction;
 use App\Actions\Order\CreateOrderAction;
@@ -29,4 +32,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::post('/orders/{order}/cancel', CancelOrderAction::class)->name('api.orders.cancel');
     Route::post('/match', MatchOrderAction::class)->name('api.match');
     Route::get('/trades', GetTradesAction::class)->name('api.trades.index');
+    Route::get('/notifications', GetNotificationsAction::class)->name('api.notifications.index');
+    Route::post('/notifications/{notification}/read', MarkNotificationReadAction::class)->name('api.notifications.read');
+    Route::post('/notifications/read-all', MarkAllNotificationsReadAction::class)->name('api.notifications.read-all');
 });

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, watch } from 'vue'
+import { toast } from 'vue-sonner'
 import { useExchangeStore } from '@/stores/exchange'
 import { createEcho } from '@/echo'
 import { Button, ThemeToggle, Toaster } from '@/components/ui'
@@ -8,6 +9,7 @@ import { UserCard, AssetList } from '@/components/profile'
 import { ExchangeRates } from '@/components/market'
 import { LoginForm } from '@/components/auth'
 import { TradingInfo } from '@/components/info'
+import { NotificationBell } from '@/components/notification'
 
 const store = useExchangeStore()
 
@@ -15,6 +17,26 @@ async function handleLoginSuccess(token: string): Promise<void> {
   store.setToken(token)
   await bootstrapData()
   setupRealtime()
+  await showPendingNotifications()
+}
+
+async function showPendingNotifications(): Promise<void> {
+  const unreadNotifications = await store.fetchNotifications()
+  if (unreadNotifications.length === 0) return
+
+  if (unreadNotifications.length <= 3) {
+    unreadNotifications.forEach((notification) => {
+      const { data } = notification
+      const action = data.side === 'sell' ? 'sold' : 'bought'
+      toast.success(`Order Filled`, {
+        description: `You ${action} ${data.amount} ${data.symbol} at $${parseFloat(data.price).toLocaleString()}`,
+      })
+    })
+  } else {
+    toast.success(`${unreadNotifications.length} orders filled`, {
+      description: `You have ${unreadNotifications.length} orders that were filled while you were away. Click the bell to view details.`,
+    })
+  }
 }
 
 async function bootstrapData(): Promise<void> {
@@ -41,6 +63,7 @@ onMounted(async (): Promise<void> => {
   if (store.token) {
     await bootstrapData()
     setupRealtime()
+    await showPendingNotifications()
   }
 })
 
@@ -75,6 +98,7 @@ watch(
           </div>
           <div class="flex items-center gap-4">
             <ExchangeRates />
+            <NotificationBell />
             <ThemeToggle />
             <Button variant="outline" @click="store.logout()">
               Sign out

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,6 +18,11 @@ final class ProfileResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $lockedBalance = $this->orders()
+            ->where('status', Order::STATUS_OPEN)
+            ->where('side', 'buy')
+            ->sum('locked_usd');
+
         return [
             'type' => 'users',
             'id' => (string) $this->id,
@@ -24,6 +30,7 @@ final class ProfileResource extends JsonResource
                 'name' => $this->name,
                 'email' => $this->email,
                 'balance' => $this->balance,
+                'locked_balance' => $lockedBalance,
             ],
             'relationships' => [
                 'assets' => AssetResource::collection($this->whenLoaded('assets')),

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import Echo from 'laravel-echo'
-import type { Profile, Order, Trade, Symbol, Side, OrderStatus, ExchangeRates } from '@/types'
+import type { Profile, Order, Trade, Symbol, Side, OrderStatus, ExchangeRates, AppNotification, NotificationsResponse } from '@/types'
 
 type EchoInstance = InstanceType<typeof Echo>
 
@@ -114,6 +114,8 @@ interface ExchangeState {
   echo: EchoInstance | null
   exchangeRates: ExchangeRates
   orderbookFilters: OrderbookFilters
+  notifications: AppNotification[]
+  unreadNotificationCount: number
 }
 
 type EchoFactory = (token: string) => EchoInstance | null
@@ -140,6 +142,8 @@ export const useExchangeStore = defineStore('exchange', {
       side: null,
       status: null,
     },
+    notifications: [],
+    unreadNotificationCount: 0,
   }),
 
   getters: {
@@ -179,6 +183,8 @@ export const useExchangeStore = defineStore('exchange', {
       this.orderbook = []
       this.myOrders = []
       this.trades = []
+      this.notifications = []
+      this.unreadNotificationCount = 0
     },
 
     initEcho(createEcho: EchoFactory): void {
@@ -196,7 +202,7 @@ export const useExchangeStore = defineStore('exchange', {
         interface JsonApiProfile {
           data: {
             id: string
-            attributes: { name: string; email: string; balance: string }
+            attributes: { name: string; email: string; balance: string; locked_balance: string }
             relationships?: {
               assets: Array<{
                 id: string
@@ -219,6 +225,7 @@ export const useExchangeStore = defineStore('exchange', {
           name: attrs.name,
           email: attrs.email,
           balance: attrs.balance,
+          locked_balance: attrs.locked_balance,
           created_at: '',
           updated_at: '',
           assets,
@@ -288,6 +295,33 @@ export const useExchangeStore = defineStore('exchange', {
       this.fetchOrderbook()
       this.fetchMyOrders()
       this.fetchTrades()
+    },
+
+    async fetchNotifications(): Promise<AppNotification[]> {
+      if (!this.token) return []
+      const { data } = await axios.get<NotificationsResponse>('/api/notifications')
+      this.notifications = data.data
+      this.unreadNotificationCount = data.meta.unread_count
+      return data.data.filter((n) => n.read_at === null)
+    },
+
+    async markNotificationRead(notificationId: string): Promise<void> {
+      await axios.post(`/api/notifications/${notificationId}/read`)
+      const notification = this.notifications.find((n) => n.id === notificationId)
+      if (notification) {
+        notification.read_at = new Date().toISOString()
+        this.unreadNotificationCount = Math.max(0, this.unreadNotificationCount - 1)
+      }
+    },
+
+    async markAllNotificationsRead(): Promise<void> {
+      await axios.post('/api/notifications/read-all')
+      this.notifications.forEach((n) => {
+        if (n.read_at === null) {
+          n.read_at = new Date().toISOString()
+        }
+      })
+      this.unreadNotificationCount = 0
     },
 
     async fetchExchangeRates(): Promise<void> {

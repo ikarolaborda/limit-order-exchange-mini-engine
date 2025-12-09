@@ -7,7 +7,6 @@
     "css": "resources/css/app.css",
     "baseColor": "slate"
   },
-  "framework": "vite",
   "aliases": {
     "components": "@/components",
     "utils": "@/lib/utils",

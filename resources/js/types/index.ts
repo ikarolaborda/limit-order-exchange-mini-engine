@@ -17,6 +17,7 @@ export interface Asset {
 
 export interface Profile extends User {
   assets: Asset[]
+  locked_balance: string
 }
 
 export interface Order {
@@ -65,5 +66,29 @@ export interface ExchangeRates {
   BTC: number | null
   ETH: number | null
   lastUpdated: Date | null
+}
+
+export interface OrderFilledNotificationData {
+  trade_id: number
+  symbol: Symbol
+  price: string
+  amount: string
+  total: string
+  side: Side
+}
+
+export interface AppNotification {
+  id: string
+  type: string
+  data: OrderFilledNotificationData
+  read_at: string | null
+  created_at: string
+}
+
+export interface NotificationsResponse {
+  data: AppNotification[]
+  meta: {
+    unread_count: number
+  }
 }
 

@@ -10,6 +10,7 @@ use App\Contracts\Repositories\TradeRepositoryInterface;
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Events\OrderMatched;
 use App\Models\Order;
+use App\Notifications\OrderFilledNotification;
 use App\Models\Trade;
 use App\Support\Decimal;
 use Illuminate\Http\JsonResponse;
@@ -109,8 +110,10 @@ final class MatchOrderAction
             'fee' => $fee->toString(),
         ]);
 
-        DB::afterCommit(function () use ($trade): void {
+        DB::afterCommit(function () use ($trade, $buyer, $seller): void {
             event(new OrderMatched($trade));
+            $buyer->notify(new OrderFilledNotification($trade, 'buy'));
+            $seller->notify(new OrderFilledNotification($trade, 'sell'));
         });
 
         return $trade;

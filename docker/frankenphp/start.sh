@@ -10,5 +10,9 @@ fi
 # Run database migrations
 php artisan migrate --force
 
-# Start the application
-exec php artisan octane:frankenphp --host=0.0.0.0 --port=8000
+# If arguments were passed, use them; otherwise default to Octane
+if [ $# -gt 0 ]; then
+    exec "$@"
+else
+    exec php artisan octane:frankenphp --host=0.0.0.0 --port=8000
+fi

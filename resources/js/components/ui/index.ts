@@ -9,4 +9,7 @@ export * from './theme-toggle'
 export * from './sonner'
 export * from './form'
 export * from './tooltip'
+export * from './popover'
+export * from './scroll-area'
+export * from './separator'
 
