@@ -40,4 +40,8 @@ return [
         'api_key' => env('WEB3_SERVICE_API_KEY', ''),
     ],
 
+    'ai' => [
+        'use_mock' => env('AI_USE_MOCK', true),
+    ],
+
 ];
