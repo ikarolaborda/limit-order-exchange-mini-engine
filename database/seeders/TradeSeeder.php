@@ -13,14 +13,16 @@ class TradeSeeder extends Seeder
 {
     public function run(): void
     {
+        if (Trade::exists()) {
+            return;
+        }
+
         $users = User::all();
 
         if ($users->count() < 2) {
             return;
         }
 
-        // Create sample trades between different user pairs
-        // Trade 1: Alice (1) sells BTC to Bob (2)
         $this->createTrade(
             buyer: $users->get(1),
             seller: $users->get(0),
@@ -30,7 +32,6 @@ class TradeSeeder extends Seeder
             fee: '95.625',
         );
 
-        // Trade 2: Bob (2) sells BTC to Charlie (3)
         $this->createTrade(
             buyer: $users->get(2),
             seller: $users->get(1),
@@ -40,7 +41,6 @@ class TradeSeeder extends Seeder
             fee: '51.30',
         );
 
-        // Trade 3: Charlie (3) sells BTC to Diana (4)
         $this->createTrade(
             buyer: $users->get(3),
             seller: $users->get(2),
@@ -50,7 +50,6 @@ class TradeSeeder extends Seeder
             fee: '159.75',
         );
 
-        // Trade 4: Diana (4) sells ETH to Alice (1)
         $this->createTrade(
             buyer: $users->get(0),
             seller: $users->get(3),
@@ -60,7 +59,6 @@ class TradeSeeder extends Seeder
             fee: '50.625',
         );
 
-        // Trade 5: Alice (1) sells ETH to Bob (2)
         $this->createTrade(
             buyer: $users->get(1),
             seller: $users->get(0),
@@ -70,7 +68,6 @@ class TradeSeeder extends Seeder
             fee: '68.25',
         );
 
-        // Trade 6: Bob (2) sells ETH to Charlie (3)
         $this->createTrade(
             buyer: $users->get(2),
             seller: $users->get(1),
@@ -80,7 +77,6 @@ class TradeSeeder extends Seeder
             fee: '34.20',
         );
 
-        // Trade 7: Charlie (3) sells ETH to Diana (4)
         $this->createTrade(
             buyer: $users->get(3),
             seller: $users->get(2),
@@ -90,7 +86,6 @@ class TradeSeeder extends Seeder
             fee: '17.175',
         );
 
-        // Trade 8: Diana (4) sells BTC to Alice (1)
         $this->createTrade(
             buyer: $users->get(0),
             seller: $users->get(3),
@@ -100,27 +95,26 @@ class TradeSeeder extends Seeder
             fee: '64.20',
         );
 
-        // Create some OPEN orders for the orderbook demonstration
         $this->createOpenOrders($users);
     }
 
     private function createOpenOrders(\Illuminate\Support\Collection $users): void
     {
-        // BTC buy orders at various prices (Bob, Charlie)
+        if (Order::where('status', Order::STATUS_OPEN)->exists()) {
+            return;
+        }
+
         $this->createOpenOrder($users->get(1), 'BTC', 'buy', '89500.00', '0.05');
         $this->createOpenOrder($users->get(2), 'BTC', 'buy', '89000.00', '0.10');
         $this->createOpenOrder($users->get(3), 'BTC', 'buy', '88500.00', '0.08');
 
-        // BTC sell orders at various prices (Charlie, Diana)
         $this->createOpenOrder($users->get(2), 'BTC', 'sell', '91000.00', '0.12');
         $this->createOpenOrder($users->get(3), 'BTC', 'sell', '91500.00', '0.06');
         $this->createOpenOrder($users->get(1), 'BTC', 'sell', '92000.00', '0.15');
 
-        // ETH buy orders
         $this->createOpenOrder($users->get(0), 'ETH', 'buy', '3050.00', '2.0');
         $this->createOpenOrder($users->get(2), 'ETH', 'buy', '3000.00', '1.5');
 
-        // ETH sell orders
         $this->createOpenOrder($users->get(1), 'ETH', 'sell', '3200.00', '3.0');
         $this->createOpenOrder($users->get(3), 'ETH', 'sell', '3250.00', '1.0');
     }

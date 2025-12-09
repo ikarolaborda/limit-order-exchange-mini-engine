@@ -15,7 +15,6 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        // Create 4 demo traders
         $traders = [
             [
                 'name' => 'Alice Trader',
@@ -48,30 +47,36 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($traders as $index => $traderData) {
-            $user = User::factory()->create([
-                'name' => $traderData['name'],
-                'email' => $traderData['email'],
-                'password' => 'password', // Will be hashed by the model
-                'balance' => $traderData['balance'],
-            ]);
+            $user = User::firstOrCreate(
+                ['email' => $traderData['email']],
+                [
+                    'name' => $traderData['name'],
+                    'password' => bcrypt('password'),
+                    'balance' => $traderData['balance'],
+                    'email_verified_at' => now(),
+                ]
+            );
 
-            // Create API token for each user
-            PersonalAccessToken::create([
-                'tokenable_type' => User::class,
-                'tokenable_id' => $user->id,
-                'name' => 'dev-token-' . ($index + 1),
-                'token' => hash('sha256', 'dev-token-' . ($index + 1)),
-                'abilities' => ['*'],
-            ]);
+            PersonalAccessToken::firstOrCreate(
+                [
+                    'tokenable_type' => User::class,
+                    'tokenable_id' => $user->id,
+                    'name' => 'dev-token-' . ($index + 1),
+                ],
+                [
+                    'token' => hash('sha256', 'dev-token-' . ($index + 1)),
+                    'abilities' => ['*'],
+                ]
+            );
 
-            // Create assets for each user
-            $user->assets()->createMany([
-                ['symbol' => 'BTC', 'amount' => $traderData['btc'], 'locked_amount' => 0],
-                ['symbol' => 'ETH', 'amount' => $traderData['eth'], 'locked_amount' => 0],
-            ]);
+            foreach ([['symbol' => 'BTC', 'amount' => $traderData['btc']], ['symbol' => 'ETH', 'amount' => $traderData['eth']]] as $asset) {
+                $user->assets()->firstOrCreate(
+                    ['symbol' => $asset['symbol']],
+                    ['amount' => $asset['amount'], 'locked_amount' => 0]
+                );
+            }
         }
 
-        // Create sample trades between users
         $this->call(TradeSeeder::class);
     }
 }
