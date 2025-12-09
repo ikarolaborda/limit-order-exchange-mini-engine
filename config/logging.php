@@ -127,6 +127,22 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        'kafka' => [
+            'driver' => 'custom',
+            'via' => \App\Logging\KafkaLogger::class,
+            'topic' => env('KAFKA_LOG_TOPIC', 'logs.laravel'),
+            'service_name' => env('APP_NAME', 'laravel-exchange'),
+            'level' => env('LOG_LEVEL', 'debug'),
+        ],
+
+        'activity' => [
+            'driver' => 'custom',
+            'via' => \App\Logging\KafkaLogger::class,
+            'topic' => env('KAFKA_ACTIVITY_TOPIC', 'logs.activities'),
+            'service_name' => env('APP_NAME', 'laravel-exchange'),
+            'level' => 'info',
+        ],
+
     ],
 
 ];
