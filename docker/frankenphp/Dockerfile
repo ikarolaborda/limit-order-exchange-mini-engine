@@ -15,7 +15,8 @@ RUN install-php-extensions \
     opcache \
     zip \
     ffi \
-    gd
+    gd \
+    rdkafka
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -57,7 +58,8 @@ RUN install-php-extensions \
     redis \
     opcache \
     ffi \
-    gd
+    gd \
+    rdkafka
 
 COPY --from=builder /app /app
 

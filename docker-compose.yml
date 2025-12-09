@@ -9,10 +9,14 @@ services:
     ports:
       - "8000:8000"
     env_file: .env
+    environment:
+      - KAFKA_BROKERS=kafka:9092
     depends_on:
       db:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      kafka:
         condition: service_healthy
     volumes:
       - .:/app
@@ -32,9 +36,12 @@ services:
       target: development
     command: php artisan queue:work --sleep=3 --tries=3 --max-time=3600
     env_file: .env
+    environment:
+      - KAFKA_BROKERS=kafka:9092
     depends_on:
       - app
       - redis
+      - kafka
     volumes:
       - .:/app
 
@@ -109,14 +116,55 @@ services:
       - ETHEREUM_CHAIN_ID=1337
       - ETHEREUM_KEYSTORE_DIR=/app/keystore
       - API_KEY=${WEB3_SERVICE_API_KEY:-web3-secret-key}
+      - KAFKA_BROKERS=kafka:9092
+      - KAFKA_LOG_TOPIC=logs.web3-service
     volumes:
       - web3-keystore:/app/keystore
     depends_on:
       - ganache
+      - kafka
+
+  kafka:
+    image: apache/kafka:latest
+    ports:
+      - "9092:9092"
+    environment:
+      - KAFKA_NODE_ID=1
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+      - CLUSTER_ID=MkU3OEVBNTcwNTJENDM2Qk
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+    depends_on:
+      kafka:
+        condition: service_healthy
 
 volumes:
   db-data:
   redis-data:
   ganache-data:
   web3-keystore:
+  kafka-data:
 
