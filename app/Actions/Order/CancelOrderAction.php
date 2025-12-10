@@ -82,9 +82,17 @@ final class CancelOrderAction
 
     public function handle(Order $order): Order
     {
-        $this->checkStatus($order);
-
         return DB::transaction(function () use ($order): Order {
+            $order = $this->orderRepository->findByIdWithLock($order->id);
+
+            if ($order === null) {
+                throw ValidationException::withMessages([
+                    'order' => 'Order not found.',
+                ]);
+            }
+
+            $this->checkStatus($order);
+
             $side = $order->side |> strtoupper(...);
 
             if ($side === 'BUY') {
