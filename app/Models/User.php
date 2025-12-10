@@ -14,6 +14,7 @@ final class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens;
+
     use HasFactory;
     use Notifiable;
 
@@ -77,5 +78,13 @@ final class User extends Authenticatable
     public function blockchainTransactions(): HasMany
     {
         return $this->hasMany(BlockchainTransaction::class);
+    }
+
+    /**
+     * @return HasMany<ActivityLog, $this>
+     */
+    public function activities(): HasMany
+    {
+        return $this->hasMany(ActivityLog::class);
     }
 }

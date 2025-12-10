@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\Web3;
 
-use App\Services\Web3\DTO\WalletDTO;
 use App\Services\Web3\DTO\BalanceDTO;
 use App\Services\Web3\DTO\TransactionDTO;
 use App\Services\Web3\DTO\TransactionStatusDTO;
+use App\Services\Web3\DTO\WalletDTO;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
@@ -34,7 +34,7 @@ final class Web3Service implements Web3ServiceInterface
 
         if ($response->failed()) {
             throw new RuntimeException(
-                'Failed to create wallet: ' . ($response->json('error') ?? $response->body())
+                'Failed to create wallet: '.($response->json('error') ?? $response->body())
             );
         }
 
@@ -47,7 +47,7 @@ final class Web3Service implements Web3ServiceInterface
 
         if ($response->failed()) {
             throw new RuntimeException(
-                'Failed to get balance: ' . ($response->json('error') ?? $response->body())
+                'Failed to get balance: '.($response->json('error') ?? $response->body())
             );
         }
 
@@ -60,7 +60,7 @@ final class Web3Service implements Web3ServiceInterface
 
         if ($response->failed()) {
             throw new RuntimeException(
-                'Failed to list wallets: ' . ($response->json('error') ?? $response->body())
+                'Failed to list wallets: '.($response->json('error') ?? $response->body())
             );
         }
 
@@ -78,7 +78,7 @@ final class Web3Service implements Web3ServiceInterface
 
         if ($response->failed()) {
             throw new RuntimeException(
-                'Failed to send transaction: ' . ($response->json('error') ?? $response->body())
+                'Failed to send transaction: '.($response->json('error') ?? $response->body())
             );
         }
 
@@ -91,7 +91,7 @@ final class Web3Service implements Web3ServiceInterface
 
         if ($response->failed()) {
             throw new RuntimeException(
-                'Failed to get transaction status: ' . ($response->json('error') ?? $response->body())
+                'Failed to get transaction status: '.($response->json('error') ?? $response->body())
             );
         }
 

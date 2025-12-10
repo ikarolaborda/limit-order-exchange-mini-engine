@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\AI;
 
-use App\Services\AI\DTO\SentimentAnalysisDTO;
 use App\Services\AI\DTO\MarketInsightDTO;
+use App\Services\AI\DTO\SentimentAnalysisDTO;
 
 interface AIInsightsServiceInterface
 {
@@ -17,7 +17,7 @@ interface AIInsightsServiceInterface
     /**
      * Analyze sentiment of multiple texts in batch.
      *
-     * @param array<string> $texts
+     * @param  array<string>  $texts
      * @return array<SentimentAnalysisDTO>
      */
     public function analyzeSentimentBatch(array $texts): array;
@@ -30,7 +30,7 @@ interface AIInsightsServiceInterface
     /**
      * Classify text into predefined categories.
      *
-     * @param array<string> $categories
+     * @param  array<string>  $categories
      */
     public function classifyText(string $text, array $categories): array;
 }

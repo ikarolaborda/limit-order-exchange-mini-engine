@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\Web3;
 
-use App\Services\Web3\DTO\WalletDTO;
 use App\Services\Web3\DTO\BalanceDTO;
 use App\Services\Web3\DTO\TransactionDTO;
 use App\Services\Web3\DTO\TransactionStatusDTO;
+use App\Services\Web3\DTO\WalletDTO;
 
 interface Web3ServiceInterface
 {

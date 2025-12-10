@@ -10,7 +10,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class BlockchainTransaction extends Model
 {
     public const STATUS_PENDING = 'pending';
+
     public const STATUS_SUCCESS = 'success';
+
     public const STATUS_FAILED = 'failed';
 
     protected $fillable = [

@@ -53,7 +53,7 @@ final readonly class MarketInsightDTO
         };
 
         $confidence = round($sentiment->score * 100);
-        $topCategory = !empty($categories) ? $categories[0]['label'] ?? 'general' : 'general';
+        $topCategory = ! empty($categories) ? $categories[0]['label'] ?? 'general' : 'general';
 
         return sprintf(
             'The news about %s shows %s sentiment (%d%% confidence) and relates to %s topics.',

@@ -16,6 +16,7 @@ final class AIInsightsService implements AIInsightsServiceInterface
     private const CACHE_TTL = 3600; // 1 hour
 
     private ?Pipeline $sentimentPipeline = null;
+
     private ?Pipeline $zeroShotPipeline = null;
 
     private function getSentimentPipeline(): Pipeline
@@ -41,7 +42,7 @@ final class AIInsightsService implements AIInsightsServiceInterface
 
     public function analyzeSentiment(string $text): SentimentAnalysisDTO
     {
-        $cacheKey = 'ai_sentiment:' . md5($text);
+        $cacheKey = 'ai_sentiment:'.md5($text);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($text) {
             $result = $this->getSentimentPipeline()($text);
@@ -63,7 +64,7 @@ final class AIInsightsService implements AIInsightsServiceInterface
 
     public function generateMarketInsight(string $symbol, string $newsText): MarketInsightDTO
     {
-        $cacheKey = 'ai_market_insight:' . md5($symbol . $newsText);
+        $cacheKey = 'ai_market_insight:'.md5($symbol.$newsText);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($symbol, $newsText) {
             // Analyze sentiment
@@ -92,7 +93,7 @@ final class AIInsightsService implements AIInsightsServiceInterface
 
     public function classifyText(string $text, array $categories): array
     {
-        $cacheKey = 'ai_classify:' . md5($text . implode(',', $categories));
+        $cacheKey = 'ai_classify:'.md5($text.implode(',', $categories));
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($text, $categories) {
             $result = $this->getZeroShotPipeline()($text, $categories);
