@@ -60,4 +60,3 @@ final class OrderResource extends JsonResource
         };
     }
 }
-

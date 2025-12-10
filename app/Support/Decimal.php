@@ -97,4 +97,3 @@ final readonly class Decimal
         return $trimmed === '' ? '0' : $trimmed;
     }
 }
-

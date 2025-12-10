@@ -24,4 +24,3 @@ final class OrderCollection extends ResourceCollection
         ];
     }
 }
-

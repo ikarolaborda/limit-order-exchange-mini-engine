@@ -9,4 +9,3 @@ Broadcast::channel('private-user.{userId}', fn (User $user, int $userId): ?array
     ? ['id' => $user->id, 'name' => $user->name]
     : null
 );
-
