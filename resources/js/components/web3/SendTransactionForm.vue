@@ -1,21 +1,11 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { Card, CardHeader, CardTitle, CardContent, Button, Input, Label } from '@/components/ui'
-import type { UserWallet } from '@/types'
+import { useWallets } from '@/composables/useWallets'
 import axios from 'axios'
 
-interface JsonApiWallet {
-  type: string
-  id: string
-  attributes: {
-    address: string
-    label: string | null
-    is_primary: boolean
-    created_at: string
-  }
-}
+const { wallets, hasWallets, initializeIfNeeded, fetchWallets } = useWallets()
 
-const wallets = ref<UserWallet[]>([])
 const selectedWallet = ref('')
 const toAddress = ref('')
 const amount = ref('')
@@ -24,7 +14,6 @@ const loading = ref(false)
 const error = ref('')
 const success = ref('')
 
-const hasWallets = computed(() => wallets.value.length > 0)
 const isValid = computed(() => {
   return (
     selectedWallet.value &&
@@ -35,25 +24,12 @@ const isValid = computed(() => {
   )
 })
 
-async function fetchWallets() {
-  try {
-    const { data } = await axios.get<{ data: JsonApiWallet[] }>('/api/web3/wallets')
-    wallets.value = data.data.map((w) => ({
-      id: parseInt(w.id, 10),
-      address: w.attributes.address,
-      label: w.attributes.label,
-      is_primary: w.attributes.is_primary,
-      created_at: w.attributes.created_at,
-    }))
-
-    if (wallets.value.length > 0) {
-      const primary = wallets.value.find((w) => w.is_primary)
-      selectedWallet.value = primary?.address || wallets.value[0].address
-    }
-  } catch (e) {
-    console.error('Failed to fetch wallets:', e)
+watch(wallets, (newWallets) => {
+  if (newWallets.length > 0 && !selectedWallet.value) {
+    const primary = newWallets.find((w) => w.is_primary)
+    selectedWallet.value = primary?.address || newWallets[0].address
   }
-}
+}, { immediate: true })
 
 async function sendTransaction() {
   if (!isValid.value) return
@@ -74,6 +50,7 @@ async function sendTransaction() {
     toAddress.value = ''
     amount.value = ''
     password.value = ''
+    await fetchWallets()
   } catch (e: unknown) {
     const axiosError = e as { response?: { data?: { error?: string } } }
     error.value = axiosError.response?.data?.error || 'Failed to send transaction'
@@ -86,7 +63,7 @@ function truncateAddress(address: string): string {
   return `${address.slice(0, 6)}...${address.slice(-4)}`
 }
 
-onMounted(fetchWallets)
+onMounted(initializeIfNeeded)
 </script>
 
 <template>

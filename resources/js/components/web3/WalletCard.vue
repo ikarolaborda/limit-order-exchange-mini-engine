@@ -1,80 +1,17 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter, Badge, Button, Input, Label } from '@/components/ui'
-import type { UserWallet, WalletBalance } from '@/types'
-import axios from 'axios'
+import { useWallets } from '@/composables/useWallets'
 
-interface JsonApiWallet {
-  type: string
-  id: string
-  attributes: {
-    address: string
-    label: string | null
-    is_primary: boolean
-    created_at: string
-  }
-}
+const { wallets, balances, loading, hasWallets, createWallet, initializeIfNeeded } = useWallets()
 
-interface JsonApiBalance {
-  type: string
-  id: string
-  attributes: {
-    address: string
-    balance_wei: string
-    balance_eth: string
-  }
-}
-
-const wallets = ref<UserWallet[]>([])
-const balances = ref<Record<string, WalletBalance>>({})
-const loading = ref(false)
 const creating = ref(false)
 const newWalletPassword = ref('')
 const newWalletLabel = ref('')
 const showCreateForm = ref(false)
 const error = ref('')
 
-const hasWallets = computed(() => wallets.value.length > 0)
-
-async function fetchWallets() {
-  loading.value = true
-  try {
-    const { data } = await axios.get<{ data: JsonApiWallet[] }>('/api/web3/wallets')
-    wallets.value = data.data.map((w) => ({
-      id: parseInt(w.id, 10),
-      address: w.attributes.address,
-      label: w.attributes.label,
-      is_primary: w.attributes.is_primary,
-      created_at: w.attributes.created_at,
-    }))
-
-    for (const wallet of wallets.value) {
-      fetchBalance(wallet.address)
-    }
-  } catch (e) {
-    console.error('Failed to fetch wallets:', e)
-  } finally {
-    loading.value = false
-  }
-}
-
-async function fetchBalance(address: string) {
-  try {
-    const wallet = wallets.value.find((w) => w.address === address)
-    if (!wallet) return
-
-    const { data } = await axios.get<{ data: JsonApiBalance }>(`/api/web3/wallets/${wallet.id}/balance`)
-    balances.value[address] = {
-      address: data.data.attributes.address,
-      balance_wei: data.data.attributes.balance_wei,
-      balance_eth: data.data.attributes.balance_eth,
-    }
-  } catch (e) {
-    console.error('Failed to fetch balance:', e)
-  }
-}
-
-async function createWallet() {
+async function handleCreateWallet() {
   if (!newWalletPassword.value || newWalletPassword.value.length < 8) {
     error.value = 'Password must be at least 8 characters'
     return
@@ -84,15 +21,10 @@ async function createWallet() {
   error.value = ''
 
   try {
-    await axios.post('/api/web3/wallets', {
-      password: newWalletPassword.value,
-      label: newWalletLabel.value || null,
-    })
-
+    await createWallet(newWalletPassword.value, newWalletLabel.value || null)
     newWalletPassword.value = ''
     newWalletLabel.value = ''
     showCreateForm.value = false
-    await fetchWallets()
   } catch (e: unknown) {
     const axiosError = e as { response?: { data?: { error?: string } } }
     error.value = axiosError.response?.data?.error || 'Failed to create wallet'
@@ -115,7 +47,7 @@ function copyAddress(address: string) {
   navigator.clipboard.writeText(address)
 }
 
-onMounted(fetchWallets)
+onMounted(initializeIfNeeded)
 </script>
 
 <template>
@@ -154,7 +86,7 @@ onMounted(fetchWallets)
         </div>
         <div v-if="error" class="text-sm text-destructive">{{ error }}</div>
         <div class="flex gap-2">
-          <Button :disabled="creating" @click="createWallet">
+          <Button :disabled="creating" @click="handleCreateWallet">
             {{ creating ? 'Creating...' : 'Create Wallet' }}
           </Button>
           <Button variant="outline" @click="showCreateForm = false">Cancel</Button>
