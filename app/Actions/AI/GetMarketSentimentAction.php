@@ -8,7 +8,69 @@ use App\Services\AI\AIInsightsServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Lorisleiva\Actions\Concerns\AsAction;
+use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\Response;
 
+#[OA\Get(
+    path: '/api/ai/market-sentiment',
+    operationId: 'getMarketSentiment',
+    description: 'Returns aggregated AI-powered market sentiment for BTC and ETH. Results are cached for 1 hour. Provides quick sentiment overview with trading recommendations.',
+    summary: 'Get market sentiment overview',
+    security: [['sanctum' => []]],
+    tags: ['AI'],
+    responses: [
+        new OA\Response(
+            response: Response::HTTP_OK,
+            description: 'Market sentiment retrieved',
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(
+                        property: 'data',
+                        properties: [
+                            new OA\Property(property: 'type', type: 'string', example: 'market_sentiment'),
+                            new OA\Property(
+                                property: 'attributes',
+                                properties: [
+                                    new OA\Property(
+                                        property: 'BTC',
+                                        properties: [
+                                            new OA\Property(property: 'symbol', type: 'string', example: 'BTC'),
+                                            new OA\Property(property: 'sentiment', type: 'string', example: 'positive'),
+                                            new OA\Property(property: 'confidence', type: 'number', example: 0.85),
+                                            new OA\Property(property: 'recommendation', type: 'string', example: 'bullish'),
+                                            new OA\Property(property: 'summary', type: 'string'),
+                                            new OA\Property(property: 'top_category', type: 'string', example: 'institutional'),
+                                        ],
+                                        type: 'object'
+                                    ),
+                                    new OA\Property(
+                                        property: 'ETH',
+                                        properties: [
+                                            new OA\Property(property: 'symbol', type: 'string', example: 'ETH'),
+                                            new OA\Property(property: 'sentiment', type: 'string', example: 'positive'),
+                                            new OA\Property(property: 'confidence', type: 'number', example: 0.78),
+                                            new OA\Property(property: 'recommendation', type: 'string', example: 'bullish'),
+                                            new OA\Property(property: 'summary', type: 'string'),
+                                            new OA\Property(property: 'top_category', type: 'string', example: 'technical'),
+                                        ],
+                                        type: 'object'
+                                    ),
+                                ],
+                                type: 'object'
+                            ),
+                        ],
+                        type: 'object'
+                    ),
+                ]
+            )
+        ),
+        new OA\Response(
+            response: Response::HTTP_UNAUTHORIZED,
+            description: 'Unauthenticated',
+            content: new OA\JsonContent(ref: '#/components/schemas/UnauthorizedError')
+        ),
+    ]
+)]
 final class GetMarketSentimentAction
 {
     use AsAction;
@@ -59,7 +121,7 @@ final class GetMarketSentimentAction
 
     private function selectScenario(string $symbol): string
     {
-        $hash = crc32($symbol . date('Y-m-d-H'));
+        $hash = crc32($symbol.date('Y-m-d-H'));
         $options = ['positive', 'negative', 'neutral'];
 
         return $options[$hash % 3];
