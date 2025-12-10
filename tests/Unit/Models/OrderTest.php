@@ -21,7 +21,7 @@ final class OrderTest extends TestCase
     #[Test]
     public function it_has_fillable_attributes(): void
     {
-        $order = new Order();
+        $order = new Order;
         $fillable = $order->getFillable();
 
         $this->assertContains('user_id', $fillable);

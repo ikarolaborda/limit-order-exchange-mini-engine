@@ -86,4 +86,3 @@ final class OrderFactory extends Factory
         ]);
     }
 }
-

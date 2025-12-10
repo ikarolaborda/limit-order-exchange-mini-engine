@@ -18,8 +18,11 @@ use Tests\TestCase;
 final class CancelOrderActionTest extends TestCase
 {
     private OrderRepositoryInterface&MockInterface $orderRepository;
+
     private UserRepositoryInterface&MockInterface $userRepository;
+
     private AssetRepositoryInterface&MockInterface $assetRepository;
+
     private CancelOrderAction $action;
 
     protected function setUp(): void
@@ -71,4 +74,3 @@ final class CancelOrderActionTest extends TestCase
         $this->action->handle($order);
     }
 }
-

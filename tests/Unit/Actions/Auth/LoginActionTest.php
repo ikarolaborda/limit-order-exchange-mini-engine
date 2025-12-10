@@ -11,12 +11,13 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Mockery;
 use Mockery\MockInterface;
-use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 final class LoginActionTest extends TestCase
 {
     private UserRepositoryInterface&MockInterface $userRepository;
+
     private LoginAction $action;
 
     protected function setUp(): void
@@ -99,4 +100,3 @@ final class LoginActionTest extends TestCase
         ]);
     }
 }
-

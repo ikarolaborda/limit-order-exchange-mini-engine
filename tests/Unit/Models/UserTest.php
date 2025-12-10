@@ -13,7 +13,7 @@ final class UserTest extends TestCase
     #[Test]
     public function it_has_fillable_attributes(): void
     {
-        $user = new User();
+        $user = new User;
         $fillable = $user->getFillable();
 
         $this->assertContains('name', $fillable);
@@ -25,7 +25,7 @@ final class UserTest extends TestCase
     #[Test]
     public function it_has_hidden_attributes(): void
     {
-        $user = new User();
+        $user = new User;
         $hidden = $user->getHidden();
 
         $this->assertContains('password', $hidden);
@@ -35,7 +35,7 @@ final class UserTest extends TestCase
     #[Test]
     public function it_casts_balance_as_decimal(): void
     {
-        $user = new User();
+        $user = new User;
         $casts = $user->getCasts();
 
         $this->assertArrayHasKey('balance', $casts);
