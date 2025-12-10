@@ -24,4 +24,3 @@ interface UserRepositoryInterface
 
     public function decrementBalanceWithLock(int $userId, string $amount): void;
 }
-

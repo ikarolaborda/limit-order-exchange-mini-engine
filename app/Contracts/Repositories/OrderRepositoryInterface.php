@@ -23,4 +23,3 @@ interface OrderRepositoryInterface
 
     public function findMatchingCounterOrder(Order $order): ?Order;
 }
-

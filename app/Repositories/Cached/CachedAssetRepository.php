@@ -11,6 +11,7 @@ use Illuminate\Cache\Repository as CacheRepository;
 final readonly class CachedAssetRepository implements AssetRepositoryInterface
 {
     private const int CACHE_TTL = 60;
+
     private const string CACHE_PREFIX = 'assets:';
 
     public function __construct(
@@ -21,7 +22,7 @@ final readonly class CachedAssetRepository implements AssetRepositoryInterface
     public function findByUserAndSymbol(int $userId, string $symbol): ?Asset
     {
         return $this->cache->remember(
-            self::CACHE_PREFIX . "user:{$userId}:symbol:{$symbol}",
+            self::CACHE_PREFIX."user:{$userId}:symbol:{$symbol}",
             self::CACHE_TTL,
             fn (): ?Asset => $this->repository->findByUserAndSymbol($userId, $symbol)
         );
@@ -65,7 +66,6 @@ final readonly class CachedAssetRepository implements AssetRepositoryInterface
 
     private function invalidateCache(int $userId, string $symbol): void
     {
-        $this->cache->forget(self::CACHE_PREFIX . "user:{$userId}:symbol:{$symbol}");
+        $this->cache->forget(self::CACHE_PREFIX."user:{$userId}:symbol:{$symbol}");
     }
 }
-

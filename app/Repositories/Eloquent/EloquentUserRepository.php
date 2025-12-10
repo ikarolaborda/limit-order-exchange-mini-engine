@@ -51,4 +51,3 @@ final class EloquentUserRepository implements UserRepositoryInterface
         $user?->decrement('balance', $amount);
     }
 }
-

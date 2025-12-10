@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
 final readonly class CachedOrderRepository implements OrderRepositoryInterface
 {
     private const int CACHE_TTL = 60;
+
     private const string CACHE_PREFIX = 'orders:';
 
     public function __construct(
@@ -22,7 +23,7 @@ final readonly class CachedOrderRepository implements OrderRepositoryInterface
     public function findById(int $id): ?Order
     {
         return $this->cache->remember(
-            self::CACHE_PREFIX . "id:{$id}",
+            self::CACHE_PREFIX."id:{$id}",
             self::CACHE_TTL,
             fn (): ?Order => $this->repository->findById($id)
         );
@@ -38,7 +39,7 @@ final readonly class CachedOrderRepository implements OrderRepositoryInterface
         // Only cache the default (no filters) case for simplicity
         if ($side === null && $status === null) {
             return $this->cache->remember(
-                self::CACHE_PREFIX . "orderbook:{$symbol}",
+                self::CACHE_PREFIX."orderbook:{$symbol}",
                 self::CACHE_TTL,
                 fn (): Collection => $this->repository->getOpenOrdersForSymbol($symbol)
             );
@@ -50,7 +51,7 @@ final readonly class CachedOrderRepository implements OrderRepositoryInterface
     public function getUserOrders(int $userId): Collection
     {
         return $this->cache->remember(
-            self::CACHE_PREFIX . "user:{$userId}",
+            self::CACHE_PREFIX."user:{$userId}",
             self::CACHE_TTL,
             fn (): Collection => $this->repository->getUserOrders($userId)
         );
@@ -79,9 +80,8 @@ final readonly class CachedOrderRepository implements OrderRepositoryInterface
 
     private function invalidateCache(Order $order): void
     {
-        $this->cache->forget(self::CACHE_PREFIX . "id:{$order->id}");
-        $this->cache->forget(self::CACHE_PREFIX . "orderbook:{$order->symbol}");
-        $this->cache->forget(self::CACHE_PREFIX . "user:{$order->user_id}");
+        $this->cache->forget(self::CACHE_PREFIX."id:{$order->id}");
+        $this->cache->forget(self::CACHE_PREFIX."orderbook:{$order->symbol}");
+        $this->cache->forget(self::CACHE_PREFIX."user:{$order->user_id}");
     }
 }
-

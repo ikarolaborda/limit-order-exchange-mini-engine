@@ -73,4 +73,3 @@ final class EloquentAssetRepository implements AssetRepositoryInterface
         $toAsset->increment('amount', $amount);
     }
 }
-
