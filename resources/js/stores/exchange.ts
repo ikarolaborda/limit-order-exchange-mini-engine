@@ -293,12 +293,15 @@ export const useExchangeStore = defineStore('exchange', {
       await Promise.all([this.fetchProfile(), this.fetchOrderbook(), this.fetchMyOrders()])
     },
 
-    handleTrade(trade: Trade): void {
+    async handleTrade(trade: Trade): Promise<void> {
       this.trades.unshift(trade)
-      this.fetchProfile()
-      this.fetchOrderbook()
-      this.fetchMyOrders()
-      this.fetchTrades()
+      await Promise.all([
+        this.fetchProfile(),
+        this.fetchOrderbook(),
+        this.fetchMyOrders(),
+        this.fetchTrades(),
+        this.fetchNotifications(),
+      ])
     },
 
     async fetchNotifications(): Promise<AppNotification[]> {

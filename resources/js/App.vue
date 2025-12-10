@@ -44,8 +44,19 @@ function setupRealtime(): void {
     store.initEcho((token: string) => {
       const echo = createEcho(token)
       if (echo && store.profile?.id) {
-        echo.private(`private-user.${store.profile.id}`).listen('.OrderMatched', (payload: unknown) => {
-          store.handleTrade(payload as Parameters<typeof store.handleTrade>[0])
+        echo.private(`private-user.${store.profile.id}`).listen('.OrderMatched', async (payload: unknown) => {
+          const previousUnreadCount = store.unreadNotificationCount
+          await store.handleTrade(payload as Parameters<typeof store.handleTrade>[0])
+          if (store.unreadNotificationCount > previousUnreadCount) {
+            const latestNotification = store.notifications.find((n) => n.read_at === null)
+            if (latestNotification) {
+              const { data } = latestNotification
+              const action = data.side === 'sell' ? 'sold' : 'bought'
+              toast.success('Order Filled', {
+                description: `You ${action} ${data.amount} ${data.symbol} at $${parseFloat(data.price).toLocaleString()}`,
+              })
+            }
+          }
         })
       }
       return echo
