@@ -13,4 +13,5 @@ export * from './tooltip'
 export * from './popover'
 export * from './scroll-area'
 export * from './separator'
+export * from './navigation-menu'
 

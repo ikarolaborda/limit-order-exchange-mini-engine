@@ -3,15 +3,9 @@ import { onMounted, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import { useExchangeStore } from '@/stores/exchange'
 import { createEcho } from '@/echo'
-import { Button, ThemeToggle, Toaster } from '@/components/ui'
-import { OrderForm, Orderbook, MyOrders, RecentTrades } from '@/components/exchange'
-import { UserCard, AssetList } from '@/components/profile'
-import { ExchangeRates } from '@/components/market'
+import { Toaster } from '@/components/ui'
 import { LoginForm } from '@/components/auth'
-import { TradingInfo } from '@/components/info'
-import { NotificationBell } from '@/components/notification'
-import { WalletCard, SendTransactionForm, TransactionHistory } from '@/components/web3'
-import { AIInsights, MarketSentiment } from '@/components/ai'
+import { Navbar } from '@/components/layout'
 
 const store = useExchangeStore()
 
@@ -86,66 +80,15 @@ watch(
       <Toaster position="top-right" :duration="4000" rich-colors />
     </template>
 
-    <!-- Main Trading Interface -->
+    <!-- Main Application -->
     <template v-else>
-      <div class="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-        <header class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 class="text-3xl font-bold tracking-tight text-primary">
-              Limit Order Exchange
-            </h1>
-            <p class="mt-1 text-sm text-muted-foreground">
-              High-performance matching engine with real-time updates
-            </p>
+      <div class="flex min-h-screen flex-col">
+        <Navbar />
+        <main class="flex-1">
+          <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <router-view />
           </div>
-          <div class="flex items-center gap-4">
-            <ExchangeRates />
-            <NotificationBell />
-            <ThemeToggle />
-            <Button variant="outline" @click="store.logout()">
-              Sign out
-            </Button>
-          </div>
-        </header>
-
-        <section v-if="store.profile" class="grid gap-4 md:grid-cols-3">
-          <UserCard />
-          <AssetList />
-        </section>
-
-        <section class="rounded-lg border bg-card p-4">
-          <MarketSentiment />
-        </section>
-
-        <section class="grid gap-4 md:grid-cols-3">
-          <OrderForm />
-          <Orderbook />
-        </section>
-
-        <section class="grid gap-4 md:grid-cols-2">
-          <MyOrders />
-          <RecentTrades />
-        </section>
-
-        <section>
-          <TradingInfo />
-        </section>
-
-        <section class="space-y-4">
-          <h2 class="text-xl font-semibold">Web3 / Ethereum</h2>
-          <div class="grid gap-4 md:grid-cols-3">
-            <WalletCard />
-            <SendTransactionForm />
-            <TransactionHistory />
-          </div>
-        </section>
-
-        <section class="space-y-4">
-          <h2 class="text-xl font-semibold">AI-Powered Analysis</h2>
-          <div class="grid gap-4 md:grid-cols-2">
-            <AIInsights />
-          </div>
-        </section>
+        </main>
       </div>
       <Toaster position="top-right" :duration="4000" rich-colors />
     </template>
