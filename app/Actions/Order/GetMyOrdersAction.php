@@ -53,4 +53,3 @@ final class GetMyOrdersAction
         return new OrderCollection($orders);
     }
 }
-
