@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Order;
 
+use App\Actions\Activity\LogActivityAction;
 use App\Actions\Matching\LockAssetForSellAction;
 use App\Actions\Matching\LockFundsForBuyAction;
 use App\Actions\Matching\MatchOrderAction;
@@ -58,7 +59,7 @@ final class CreateOrderAction
     ) {}
 
     /**
-     * @param array{symbol: string, side: string, price: string|float, amount: string|float} $data
+     * @param  array{symbol: string, side: string, price: string|float, amount: string|float}  $data
      * @return array{order: Order, trade: ?Trade}
      */
     public function handle(User $user, array $data): array
@@ -82,8 +83,21 @@ final class CreateOrderAction
     public function asController(CreateOrderRequest $request): JsonResponse
     {
         $result = $this->handle($request->user(), $request->validated());
+        $order = $result['order'];
 
-        return OrderResource::make($result['order'])
+        app(LogActivityAction::class)->handle(
+            $request->user(),
+            sprintf(
+                'Placed %s order: %s %s at $%s',
+                strtoupper($order->side),
+                $order->amount,
+                $order->symbol,
+                $order->price
+            ),
+            $request
+        );
+
+        return OrderResource::make($order)
             ->additional(['trade' => $result['trade']])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
