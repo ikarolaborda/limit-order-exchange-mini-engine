@@ -3,13 +3,9 @@ import { onMounted, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import { useExchangeStore } from '@/stores/exchange'
 import { createEcho } from '@/echo'
-import { Button, ThemeToggle, Toaster } from '@/components/ui'
-import { OrderForm, Orderbook, MyOrders, RecentTrades } from '@/components/exchange'
-import { UserCard, AssetList } from '@/components/profile'
-import { ExchangeRates } from '@/components/market'
+import { Toaster } from '@/components/ui'
 import { LoginForm } from '@/components/auth'
-import { TradingInfo } from '@/components/info'
-import { NotificationBell } from '@/components/notification'
+import { Navbar } from '@/components/layout'
 
 const store = useExchangeStore()
 
@@ -48,8 +44,19 @@ function setupRealtime(): void {
     store.initEcho((token: string) => {
       const echo = createEcho(token)
       if (echo && store.profile?.id) {
-        echo.private(`private-user.${store.profile.id}`).listen('.OrderMatched', (payload: unknown) => {
-          store.handleTrade(payload as Parameters<typeof store.handleTrade>[0])
+        echo.private(`private-user.${store.profile.id}`).listen('.OrderMatched', async (payload: unknown) => {
+          const previousUnreadCount = store.unreadNotificationCount
+          await store.handleTrade(payload as Parameters<typeof store.handleTrade>[0])
+          if (store.unreadNotificationCount > previousUnreadCount) {
+            const latestNotification = store.notifications.find((n) => n.read_at === null)
+            if (latestNotification) {
+              const { data } = latestNotification
+              const action = data.side === 'sell' ? 'sold' : 'bought'
+              toast.success('Order Filled', {
+                description: `You ${action} ${data.amount} ${data.symbol} at $${parseFloat(data.price).toLocaleString()}`,
+              })
+            }
+          }
         })
       }
       return echo
@@ -84,46 +91,15 @@ watch(
       <Toaster position="top-right" :duration="4000" rich-colors />
     </template>
 
-    <!-- Main Trading Interface -->
+    <!-- Main Application -->
     <template v-else>
-      <div class="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-        <header class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 class="text-3xl font-bold tracking-tight text-primary">
-              Limit Order Exchange
-            </h1>
-            <p class="mt-1 text-sm text-muted-foreground">
-              High-performance matching engine with real-time updates
-            </p>
+      <div class="flex min-h-screen flex-col">
+        <Navbar />
+        <main class="flex-1">
+          <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <router-view />
           </div>
-          <div class="flex items-center gap-4">
-            <ExchangeRates />
-            <NotificationBell />
-            <ThemeToggle />
-            <Button variant="outline" @click="store.logout()">
-              Sign out
-            </Button>
-          </div>
-        </header>
-
-        <section v-if="store.profile" class="grid gap-4 md:grid-cols-3">
-          <UserCard />
-          <AssetList />
-        </section>
-
-        <section class="grid gap-4 md:grid-cols-3">
-          <OrderForm />
-          <Orderbook />
-        </section>
-
-        <section class="grid gap-4 md:grid-cols-2">
-          <MyOrders />
-          <RecentTrades />
-        </section>
-
-        <section>
-          <TradingInfo />
-        </section>
+        </main>
       </div>
       <Toaster position="top-right" :duration="4000" rich-colors />
     </template>

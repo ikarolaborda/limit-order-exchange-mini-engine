@@ -24,3 +24,5 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+/.transformers-cache
+public/.transformers-cache/

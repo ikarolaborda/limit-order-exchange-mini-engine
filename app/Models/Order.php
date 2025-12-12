@@ -14,7 +14,9 @@ final class Order extends Model
     use HasFactory;
 
     public const int STATUS_OPEN = 1;
+
     public const int STATUS_FILLED = 2;
+
     public const int STATUS_CANCELLED = 3;
 
     /**
@@ -51,7 +53,7 @@ final class Order extends Model
     }
 
     /**
-     * @param Builder<Order> $query
+     * @param  Builder<Order>  $query
      * @return Builder<Order>
      */
     public function scopeOpen(Builder $query): Builder

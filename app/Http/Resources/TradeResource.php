@@ -44,4 +44,3 @@ final class TradeResource extends JsonResource
         ];
     }
 }
-

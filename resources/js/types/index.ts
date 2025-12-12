@@ -92,3 +92,29 @@ export interface NotificationsResponse {
   }
 }
 
+export interface UserWallet {
+  id: number
+  address: string
+  label: string | null
+  is_primary: boolean
+  created_at: string
+}
+
+export interface BlockchainTransaction {
+  id: number
+  tx_hash: string
+  from_address: string
+  to_address: string
+  amount: string
+  status: 'pending' | 'success' | 'failed'
+  block_number: number | null
+  confirmations: number
+  created_at: string
+}
+
+export interface WalletBalance {
+  address: string
+  balance_wei: string
+  balance_eth: string
+}
+

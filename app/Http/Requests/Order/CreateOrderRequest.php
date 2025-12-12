@@ -65,4 +65,3 @@ final class CreateOrderRequest extends FormRequest
         ]);
     }
 }
-

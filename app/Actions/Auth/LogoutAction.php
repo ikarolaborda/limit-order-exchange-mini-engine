@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Auth;
 
+use App\Actions\Activity\LogActivityAction;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -55,6 +56,7 @@ final class LogoutAction
         }
 
         $user->currentAccessToken()?->delete();
+
         return 1;
     }
 
@@ -65,6 +67,8 @@ final class LogoutAction
             return response()->json(['message' => 'Already logged out'], Response::HTTP_OK);
         }
 
+        LogActivityAction::run($user, 'Logged out', $request);
+
         $revokeAll = $request->boolean('revoke_all', false);
         $count = $this->handle($user, $revokeAll);
 
@@ -74,4 +78,3 @@ final class LogoutAction
         ]);
     }
 }
-

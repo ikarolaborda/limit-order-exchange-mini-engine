@@ -74,4 +74,3 @@ final class EloquentOrderRepository implements OrderRepositoryInterface
             ->first();
     }
 }
-

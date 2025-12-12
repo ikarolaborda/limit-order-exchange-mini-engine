@@ -13,7 +13,7 @@ final class AssetTest extends TestCase
     #[Test]
     public function it_has_fillable_attributes(): void
     {
-        $asset = new Asset();
+        $asset = new Asset;
         $fillable = $asset->getFillable();
 
         $this->assertContains('user_id', $fillable);
@@ -25,7 +25,7 @@ final class AssetTest extends TestCase
     #[Test]
     public function it_casts_decimal_attributes(): void
     {
-        $asset = new Asset();
+        $asset = new Asset;
         $casts = $asset->getCasts();
 
         $this->assertArrayHasKey('amount', $casts);

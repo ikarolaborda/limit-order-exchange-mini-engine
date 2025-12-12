@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
@@ -10,6 +10,9 @@ import { toast } from 'vue-sonner'
 const emit = defineEmits<{
   'login-success': [token: string]
 }>()
+
+const appEnv = import.meta.env.VITE_APP_ENV || 'production'
+const showDemoUsers = computed(() => ['local', 'development', 'staging'].includes(appEnv))
 
 const loginSchema = toTypedSchema(
   z.object({
@@ -196,7 +199,7 @@ function fillDemoUser(demoEmail: string): void {
               </Button>
             </form>
 
-            <div class="mt-6">
+            <div v-if="showDemoUsers" class="mt-6">
               <div class="relative">
                 <div class="absolute inset-0 flex items-center">
                   <span class="w-full border-t" />

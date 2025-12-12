@@ -39,4 +39,3 @@ final class EloquentTradeRepository implements TradeRepositoryInterface
             ->get();
     }
 }
-

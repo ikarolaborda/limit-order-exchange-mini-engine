@@ -21,7 +21,7 @@ final class OrderRepositoryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->repository = new EloquentOrderRepository();
+        $this->repository = new EloquentOrderRepository;
     }
 
     #[Test]

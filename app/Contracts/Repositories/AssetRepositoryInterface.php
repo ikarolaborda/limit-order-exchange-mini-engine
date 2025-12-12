@@ -20,4 +20,3 @@ interface AssetRepositoryInterface
 
     public function transferAmount(int $fromUserId, int $toUserId, string $symbol, string $amount): void;
 }
-

@@ -61,10 +61,10 @@ class DatabaseSeeder extends Seeder
                 [
                     'tokenable_type' => User::class,
                     'tokenable_id' => $user->id,
-                    'name' => 'dev-token-' . ($index + 1),
+                    'name' => 'dev-token-'.($index + 1),
                 ],
                 [
-                    'token' => hash('sha256', 'dev-token-' . ($index + 1)),
+                    'token' => hash('sha256', 'dev-token-'.($index + 1)),
                     'abilities' => ['*'],
                 ]
             );

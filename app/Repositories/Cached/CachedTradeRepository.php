@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
 final readonly class CachedTradeRepository implements TradeRepositoryInterface
 {
     private const int CACHE_TTL = 30;
+
     private const string CACHE_PREFIX = 'trades:';
 
     public function __construct(
@@ -22,7 +23,7 @@ final readonly class CachedTradeRepository implements TradeRepositoryInterface
     public function findById(int $id): ?Trade
     {
         return $this->cache->remember(
-            self::CACHE_PREFIX . "id:{$id}",
+            self::CACHE_PREFIX."id:{$id}",
             self::CACHE_TTL,
             fn (): ?Trade => $this->repository->findById($id)
         );
@@ -39,7 +40,7 @@ final readonly class CachedTradeRepository implements TradeRepositoryInterface
     public function getTradesForSymbol(string $symbol, int $limit = 50): Collection
     {
         return $this->cache->remember(
-            self::CACHE_PREFIX . "symbol:{$symbol}:limit:{$limit}",
+            self::CACHE_PREFIX."symbol:{$symbol}:limit:{$limit}",
             self::CACHE_TTL,
             fn (): Collection => $this->repository->getTradesForSymbol($symbol, $limit)
         );
@@ -48,7 +49,7 @@ final readonly class CachedTradeRepository implements TradeRepositoryInterface
     public function getUserTrades(int $userId, int $limit = 50): Collection
     {
         return $this->cache->remember(
-            self::CACHE_PREFIX . "user:{$userId}:limit:{$limit}",
+            self::CACHE_PREFIX."user:{$userId}:limit:{$limit}",
             self::CACHE_TTL,
             fn (): Collection => $this->repository->getUserTrades($userId, $limit)
         );
@@ -56,8 +57,7 @@ final readonly class CachedTradeRepository implements TradeRepositoryInterface
 
     private function invalidateCache(Trade $trade): void
     {
-        $this->cache->forget(self::CACHE_PREFIX . "id:{$trade->id}");
-        $this->cache->forget(self::CACHE_PREFIX . "symbol:{$trade->symbol}:limit:50");
+        $this->cache->forget(self::CACHE_PREFIX."id:{$trade->id}");
+        $this->cache->forget(self::CACHE_PREFIX."symbol:{$trade->symbol}:limit:50");
     }
 }
-

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Actions\Order;
 
+use App\Actions\Activity\LogActivityAction;
 use App\Contracts\Repositories\AssetRepositoryInterface;
 use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Http\Requests\Order\CancelOrderRequest;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
-use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -82,9 +82,17 @@ final class CancelOrderAction
 
     public function handle(Order $order): Order
     {
-        $this->checkStatus($order);
-
         return DB::transaction(function () use ($order): Order {
+            $order = $this->orderRepository->findByIdWithLock($order->id);
+
+            if ($order === null) {
+                throw ValidationException::withMessages([
+                    'order' => 'Order not found.',
+                ]);
+            }
+
+            $this->checkStatus($order);
+
             $side = $order->side |> strtoupper(...);
 
             if ($side === 'BUY') {
@@ -118,8 +126,20 @@ final class CancelOrderAction
 
     public function asController(CancelOrderRequest $request, Order $order): JsonResponse
     {
-        $order = $this->handle($order);
+        $cancelledOrder = $this->handle($order);
 
-        return OrderResource::make($order)->response();
+        app(LogActivityAction::class)->handle(
+            $request->user(),
+            sprintf(
+                'Cancelled %s order: %s %s at $%s',
+                strtoupper($cancelledOrder->side),
+                $cancelledOrder->amount,
+                $cancelledOrder->symbol,
+                $cancelledOrder->price
+            ),
+            $request
+        );
+
+        return OrderResource::make($cancelledOrder)->response();
     }
 }

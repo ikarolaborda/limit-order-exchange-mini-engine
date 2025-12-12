@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 import Echo from 'laravel-echo'
 import type { Profile, Order, Trade, Symbol, Side, OrderStatus, ExchangeRates, AppNotification, NotificationsResponse } from '@/types'
+import { useWallets } from '@/composables/useWallets'
 
 type EchoInstance = InstanceType<typeof Echo>
 
@@ -185,6 +186,9 @@ export const useExchangeStore = defineStore('exchange', {
       this.trades = []
       this.notifications = []
       this.unreadNotificationCount = 0
+
+      const { reset: resetWallets } = useWallets()
+      resetWallets()
     },
 
     initEcho(createEcho: EchoFactory): void {
@@ -289,12 +293,15 @@ export const useExchangeStore = defineStore('exchange', {
       await Promise.all([this.fetchProfile(), this.fetchOrderbook(), this.fetchMyOrders()])
     },
 
-    handleTrade(trade: Trade): void {
+    async handleTrade(trade: Trade): Promise<void> {
       this.trades.unshift(trade)
-      this.fetchProfile()
-      this.fetchOrderbook()
-      this.fetchMyOrders()
-      this.fetchTrades()
+      await Promise.all([
+        this.fetchProfile(),
+        this.fetchOrderbook(),
+        this.fetchMyOrders(),
+        this.fetchTrades(),
+        this.fetchNotifications(),
+      ])
     },
 
     async fetchNotifications(): Promise<AppNotification[]> {

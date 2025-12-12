@@ -12,12 +12,14 @@
     "license": "MIT",
     "require": {
         "php": "^8.5",
+        "codewithkyrian/transformers": "^0.6.2",
         "darkaonline/l5-swagger": "^9.0",
         "laravel/framework": "^12.0",
         "laravel/octane": "^2.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
         "lorisleiva/laravel-actions": "^2.8",
+        "mateusjunges/laravel-kafka": "^2.10",
         "pusher/pusher-php-server": "^7.2"
     },
     "require-dev": {
@@ -103,7 +105,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "codewithkyrian/platform-package-installer": true
         }
     },
     "minimum-stability": "stable",

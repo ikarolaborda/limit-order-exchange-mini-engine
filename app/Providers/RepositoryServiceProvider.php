@@ -26,7 +26,7 @@ final class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(
             OrderRepositoryInterface::class,
             fn ($app): CachedOrderRepository => new CachedOrderRepository(
-                new EloquentOrderRepository(),
+                new EloquentOrderRepository,
                 $app->make(CacheRepository::class)
             )
         );
@@ -34,7 +34,7 @@ final class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(
             AssetRepositoryInterface::class,
             fn ($app): CachedAssetRepository => new CachedAssetRepository(
-                new EloquentAssetRepository(),
+                new EloquentAssetRepository,
                 $app->make(CacheRepository::class)
             )
         );
@@ -42,7 +42,7 @@ final class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(
             UserRepositoryInterface::class,
             fn ($app): CachedUserRepository => new CachedUserRepository(
-                new EloquentUserRepository(),
+                new EloquentUserRepository,
                 $app->make(CacheRepository::class)
             )
         );
@@ -50,10 +50,9 @@ final class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(
             TradeRepositoryInterface::class,
             fn ($app): CachedTradeRepository => new CachedTradeRepository(
-                new EloquentTradeRepository(),
+                new EloquentTradeRepository,
                 $app->make(CacheRepository::class)
             )
         );
     }
 }
-

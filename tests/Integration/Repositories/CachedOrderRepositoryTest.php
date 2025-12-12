@@ -25,7 +25,7 @@ final class CachedOrderRepositoryTest extends TestCase
         parent::setUp();
 
         $this->repository = new CachedOrderRepository(
-            new EloquentOrderRepository(),
+            new EloquentOrderRepository,
             app(CacheRepository::class)
         );
     }

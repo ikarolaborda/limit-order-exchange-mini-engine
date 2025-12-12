@@ -30,7 +30,9 @@ final class GetExchangeRatesAction
     use AsAction;
 
     private const CACHE_KEY = 'market:exchange_rates';
+
     private const CACHE_TTL = 120;
+
     private const COINGECKO_URL = 'https://api.coingecko.com/api/v3/simple/price';
 
     public function handle(): JsonResponse
@@ -61,6 +63,7 @@ final class GetExchangeRatesAction
 
             if ($response->successful()) {
                 $data = $response->json();
+
                 return [
                     'BTC' => $data['bitcoin']['usd'] ?? $fallback['BTC'],
                     'ETH' => $data['ethereum']['usd'] ?? $fallback['ETH'],
@@ -75,4 +78,3 @@ final class GetExchangeRatesAction
         return $fallback;
     }
 }
-

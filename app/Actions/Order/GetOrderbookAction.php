@@ -79,4 +79,3 @@ final class GetOrderbookAction
         return new OrderCollection($orders);
     }
 }
-

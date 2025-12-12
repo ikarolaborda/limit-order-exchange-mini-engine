@@ -49,4 +49,3 @@ final class GetOrderbookRequest extends FormRequest
         ]);
     }
 }
-

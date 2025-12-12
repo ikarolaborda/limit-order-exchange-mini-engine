@@ -16,6 +16,7 @@ use Tests\TestCase;
 final class RegisterActionTest extends TestCase
 {
     private UserRepositoryInterface&MockInterface $userRepository;
+
     private RegisterAction $action;
 
     protected function setUp(): void
@@ -51,7 +52,7 @@ final class RegisterActionTest extends TestCase
             'balance' => 1000.0,
         ];
 
-        $expectedUser = new User();
+        $expectedUser = new User;
         $expectedUser->setRawAttributes([
             'name' => 'John Doe',
             'email' => 'john@example.com',
@@ -91,7 +92,7 @@ final class RegisterActionTest extends TestCase
             'password' => 'password123',
         ];
 
-        $expectedUser = new User();
+        $expectedUser = new User;
 
         $this->userRepository
             ->shouldReceive('create')
@@ -106,4 +107,3 @@ final class RegisterActionTest extends TestCase
         $this->assertInstanceOf(User::class, $result);
     }
 }
-

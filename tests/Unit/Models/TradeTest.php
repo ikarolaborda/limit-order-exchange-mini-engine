@@ -13,7 +13,7 @@ final class TradeTest extends TestCase
     #[Test]
     public function it_has_fillable_attributes(): void
     {
-        $trade = new Trade();
+        $trade = new Trade;
         $fillable = $trade->getFillable();
 
         $this->assertContains('buy_order_id', $fillable);
@@ -27,7 +27,7 @@ final class TradeTest extends TestCase
     #[Test]
     public function it_casts_decimal_attributes(): void
     {
-        $trade = new Trade();
+        $trade = new Trade;
         $casts = $trade->getCasts();
 
         $this->assertArrayHasKey('price', $casts);

@@ -18,7 +18,9 @@ use Tests\TestCase;
 final class LockFundsForBuyActionTest extends TestCase
 {
     private OrderRepositoryInterface&MockInterface $orderRepository;
+
     private UserRepositoryInterface&MockInterface $userRepository;
+
     private LockFundsForBuyAction $action;
 
     protected function setUp(): void
@@ -123,7 +125,7 @@ final class LockFundsForBuyActionTest extends TestCase
                 return $amount === $expected;
             }));
 
-        $expectedOrder = new Order();
+        $expectedOrder = new Order;
 
         $this->orderRepository
             ->shouldReceive('create')
@@ -140,4 +142,3 @@ final class LockFundsForBuyActionTest extends TestCase
         $this->assertSame($expectedOrder, $result);
     }
 }
-

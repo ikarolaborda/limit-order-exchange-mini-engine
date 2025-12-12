@@ -22,7 +22,7 @@ final class LockAssetForSellAction
     ) {}
 
     /**
-     * @param array{symbol: string, side: string, price: string|float, amount: string|float} $data
+     * @param  array{symbol: string, side: string, price: string|float, amount: string|float}  $data
      */
     public function handle(User $user, array $data): Order
     {
@@ -55,4 +55,3 @@ final class LockAssetForSellAction
         ]);
     }
 }
-

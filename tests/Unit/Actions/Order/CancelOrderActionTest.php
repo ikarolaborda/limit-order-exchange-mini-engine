@@ -18,8 +18,11 @@ use Tests\TestCase;
 final class CancelOrderActionTest extends TestCase
 {
     private OrderRepositoryInterface&MockInterface $orderRepository;
+
     private UserRepositoryInterface&MockInterface $userRepository;
+
     private AssetRepositoryInterface&MockInterface $assetRepository;
+
     private CancelOrderAction $action;
 
     protected function setUp(): void
@@ -50,7 +53,14 @@ final class CancelOrderActionTest extends TestCase
             'user_id' => 1,
             'status' => Order::STATUS_FILLED,
         ]);
+        $order->id = 1;
         $order->user_id = 1;
+
+        $this->orderRepository
+            ->shouldReceive('findByIdWithLock')
+            ->with(1)
+            ->once()
+            ->andReturn($order);
 
         $this->expectException(ValidationException::class);
 
@@ -64,11 +74,17 @@ final class CancelOrderActionTest extends TestCase
             'user_id' => 1,
             'status' => Order::STATUS_CANCELLED,
         ]);
+        $order->id = 2;
         $order->user_id = 1;
+
+        $this->orderRepository
+            ->shouldReceive('findByIdWithLock')
+            ->with(2)
+            ->once()
+            ->andReturn($order);
 
         $this->expectException(ValidationException::class);
 
         $this->action->handle($order);
     }
 }
-

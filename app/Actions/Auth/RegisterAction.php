@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Auth;
 
+use App\Actions\Activity\LogActivityAction;
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\UserResource;
@@ -46,7 +47,7 @@ final class RegisterAction
     ) {}
 
     /**
-     * @param array{name: string, email: string, password: string, balance?: float} $data
+     * @param  array{name: string, email: string, password: string, balance?: float}  $data
      */
     public function handle(array $data): User
     {
@@ -63,10 +64,11 @@ final class RegisterAction
         $user = $this->handle($request->validated());
         $token = $user->createToken('api-token')->plainTextToken;
 
+        LogActivityAction::run($user, 'Account created', $request);
+
         return UserResource::make($user)
             ->additional(['token' => $token])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
     }
 }
-

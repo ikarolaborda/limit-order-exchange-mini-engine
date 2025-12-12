@@ -17,4 +17,3 @@ interface TradeRepositoryInterface
 
     public function getUserTrades(int $userId, int $limit = 50): Collection;
 }
-

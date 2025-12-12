@@ -51,4 +51,3 @@ final class ShowProfileAction
         return new ProfileResource($user);
     }
 }
-

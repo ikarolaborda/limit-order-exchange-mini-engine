@@ -45,4 +45,3 @@ final class TradeFactory extends Factory
         ]);
     }
 }
-

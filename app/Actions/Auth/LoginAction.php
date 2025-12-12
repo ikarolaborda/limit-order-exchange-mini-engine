@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Auth;
 
+use App\Actions\Activity\LogActivityAction;
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Resources\UserResource;
@@ -47,13 +48,13 @@ final class LoginAction
     ) {}
 
     /**
-     * @param array{email: string, password: string} $credentials
+     * @param  array{email: string, password: string}  $credentials
      */
     public function handle(array $credentials): User
     {
         $user = $this->userRepository->findByEmail($credentials['email']);
 
-        if ($user === null || !Hash::check($credentials['password'], $user->password)) {
+        if ($user === null || ! Hash::check($credentials['password'], $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
@@ -67,9 +68,10 @@ final class LoginAction
         $user = $this->handle($request->validated());
         $token = $user->createToken('api-token')->plainTextToken;
 
+        LogActivityAction::run($user, 'Logged in', $request);
+
         return UserResource::make($user)
             ->additional(['token' => $token])
             ->response();
     }
 }
-

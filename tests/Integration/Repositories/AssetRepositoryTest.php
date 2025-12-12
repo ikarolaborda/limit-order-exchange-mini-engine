@@ -20,7 +20,7 @@ final class AssetRepositoryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->repository = new EloquentAssetRepository();
+        $this->repository = new EloquentAssetRepository;
     }
 
     #[Test]
